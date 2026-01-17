@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { API } from "../../api";
+import  api  from "../../api";
 
 export default function AdminEvents() {
   const [items, setItems] = useState([]);
@@ -9,13 +9,13 @@ export default function AdminEvents() {
   const [end, setEnd] = useState("");
 
   async function load() {
-    const res = await API.get("/events");
+    const res = await api.get("/events");
     setItems(res.data);
   }
 
   async function create(e) {
     e.preventDefault();
-    await API.post("/events", {
+    await api.post("/events", {
       name,
       description: description || null,
       start_datetime: new Date(start).toISOString(),

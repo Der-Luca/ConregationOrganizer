@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { API } from "../../api";
+import api from "../../api";
 
 export default function UserEvents() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    API.get("/events").then((res) => setItems(res.data));
+    api.get("/events").then((res) => setItems(res.data));
   }, []);
 
   return (

@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./auth/AuthContext";
+import { Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./auth/ProtectedRoute";
 
-import SelectRole from "./pages/entry/SelectRole";
+import Login from "./pages/Login";
+
 import AdminLayout from "./layout/AdminLayout";
 import UserLayout from "./layout/UserLayout";
 
@@ -13,26 +14,39 @@ import UserBookings from "./pages/user/UserBookings";
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* ENTRY */}
-          <Route path="/" element={<SelectRole />} />
+    <Routes>
+      {/* LOGIN */}
+      <Route path="/login" element={<Login />} />
 
-          {/* ADMIN */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route path="carts" element={<AdminCarts />} />
-            <Route path="events" element={<AdminEvents />} />
-          </Route>
+      {/* USER (alle eingeloggten User, inkl. Admin) */}
+      <Route
+        path="/user"
+        element={
+          <ProtectedRoute>
+            <UserLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="carts" element={<UserCarts />} />
+        <Route path="events" element={<UserEvents />} />
+        <Route path="bookings" element={<UserBookings />} />
+      </Route>
 
-          {/* USER */}
-          <Route path="/user" element={<UserLayout />}>
-            <Route path="carts" element={<UserCarts />} />
-            <Route path="events" element={<UserEvents />} />
-              <Route path="bookings" element={<UserBookings />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+      {/* ADMIN (nur Admins) */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requireRole="admin">
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="carts" element={<AdminCarts />} />
+        <Route path="events" element={<AdminEvents />} />
+      </Route>
+
+      {/* FALLBACK */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }

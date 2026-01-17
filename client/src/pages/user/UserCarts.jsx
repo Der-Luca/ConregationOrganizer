@@ -1,11 +1,11 @@
-import { API } from "../../api";
+import api from "../../api";
 import { useEffect, useState } from "react";
 
 export default function UserCarts() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    API.get("/carts").then(res => setItems(res.data));
+    api.get("/carts").then(res => setItems(res.data));
   }, []);
 
   return (

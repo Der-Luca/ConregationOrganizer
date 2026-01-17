@@ -3,7 +3,7 @@ from sqlalchemy import Column, String, Boolean, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
-from db.base import Base
+from db.base import Base   # 👈 DAS hat gefehlt
 
 
 class User(Base):
@@ -13,6 +13,8 @@ class User(Base):
 
     firstname = Column(String, nullable=False)
     lastname = Column(String, nullable=False)
+
+    username = Column(String, unique=True, nullable=False, index=True)
     email = Column(String, unique=True, nullable=False, index=True)
 
     password_hash = Column(String, nullable=False)

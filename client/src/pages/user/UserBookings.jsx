@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { API } from "../../api";
+import api from "../../api";
 
 export default function UserBookings() {
   const [carts, setCarts] = useState([]);
@@ -12,13 +12,13 @@ export default function UserBookings() {
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    API.get("/carts").then(r => setCarts(r.data));
-    API.get("/users").then(r => setUsers(r.data)); // falls vorhanden, sonst Demo-Seed
+    api.get("/carts").then(r => setCarts(r.data));
+    api.get("/users").then(r => setUsers(r.data)); // falls vorhanden, sonst Demo-Seed
   }, []);
 
   async function loadBookings(cid) {
     if (!cid) return setBookings([]);
-    const r = await API.get(`/bookings/cart/${cid}`);
+    const r = await api.get(`/bookings/cart/${cid}`);
     setBookings(r.data);
   }
 
@@ -26,7 +26,7 @@ export default function UserBookings() {
     e.preventDefault();
     setErr("");
     try {
-      await API.post("/bookings", {
+      await api.post("/bookings", {
         cart_id: cartId,
         user_id: userId,
         start_datetime: new Date(start).toISOString(),

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { API } from "../../api";
 import AppLayout from "../../layout/AppLayout";
 import Card from "../../components/Card";
+import api from "../../api";
 
 export default function AdminCarts() {
   const [items, setItems] = useState([]);
@@ -9,13 +9,13 @@ export default function AdminCarts() {
   const [location, setLocation] = useState("");
 
   async function load() {
-    const res = await API.get("/carts");
+    const res = await api.get("/carts");
     setItems(res.data);
   }
 
   async function create(e) {
     e.preventDefault();
-    await API.post("/carts", {
+    await api.post("/carts", {
       name,
       location: location || null,
     });
