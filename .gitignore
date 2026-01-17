@@ -1,0 +1,45 @@
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# --- Env / Secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Node / Vite ---
+node_modules/
+dist/
+build/
+.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+.envrc
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# --- FastAPI / Uvicorn ---
+*.log
+
+# --- DB / Docker / Volumes ---
+postgres-data/
+pgdata/
+*.sqlite3
+
+# --- Misc ---
+coverage/
+EOF
