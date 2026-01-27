@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers import bookings
 from routers import users
 from routers import auth
+from routers import register
 
 
 
@@ -35,6 +36,7 @@ app.include_router(users.router)
 app.include_router(carts.router)
 app.include_router(events.router)
 app.include_router(bookings.router)
+app.include_router(register.router)
 
 app.add_middleware(
     CORSMiddleware,

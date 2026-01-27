@@ -15,9 +15,9 @@ class User(Base):
     lastname = Column(String, nullable=False)
 
     username = Column(String, unique=True, nullable=False, index=True)
-    email = Column(String, unique=True, nullable=False, index=True)
+    email = Column(String, unique=True, nullable=True, index=True)  # Optional
 
-    password_hash = Column(String, nullable=False)
+    password_hash = Column(String, nullable=True)  # Nullable for invited users
 
     role = Column(String, nullable=False, default="user")
     active = Column(Boolean, default=True)

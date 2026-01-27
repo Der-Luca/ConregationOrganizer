@@ -9,6 +9,7 @@ export default function AdminLayout() {
         <div className="mx-auto max-w-5xl px-4 py-2 flex gap-4 text-sm">
           <NavLink to="/admin/carts">Admin Carts</NavLink>
           <NavLink to="/admin/events">Admin Events</NavLink>
+          <NavLink to="/admin/users">Admin Users</NavLink>
         </div>
       </div>
 
