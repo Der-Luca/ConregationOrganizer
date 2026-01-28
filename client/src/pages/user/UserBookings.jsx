@@ -1,82 +1,205 @@
 import { useEffect, useState } from "react";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 import api from "../../api";
+import BookingModal from "./BookingModal";
+const localizer = momentLocalizer(moment);
 
 export default function UserBookings() {
+  const [events, setEvents] = useState([]);
   const [carts, setCarts] = useState([]);
-  const [users, setUsers] = useState([]); // Demo: später echtes Auth
-  const [cartId, setCartId] = useState("");
-  const [userId, setUserId] = useState("");
-  const [start, setStart] = useState("");
-  const [end, setEnd] = useState("");
-  const [bookings, setBookings] = useState([]);
-  const [err, setErr] = useState("");
+  const [users, setUsers] = useState([]);
+  const [view, setView] = useState("week"); // month, week, day
+  const [date, setDate] = useState(new Date());
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState(null);
 
   useEffect(() => {
-    api.get("/carts").then(r => setCarts(r.data));
-    api.get("/users").then(r => setUsers(r.data)); // falls vorhanden, sonst Demo-Seed
-  }, []);
+    loadCarts();
+    loadUsers();
+    loadCalendarBookings();
+  }, [date, view]);
 
-  async function loadBookings(cid) {
-    if (!cid) return setBookings([]);
-    const r = await api.get(`/bookings/cart/${cid}`);
-    setBookings(r.data);
+  async function loadCarts() {
+    const res = await api.get("/carts");
+    setCarts(res.data);
   }
 
-  async function submit(e) {
-    e.preventDefault();
-    setErr("");
+  async function loadUsers() {
+    const res = await api.get("/users/bookable-users");
+    setUsers(res.data);
+  }
+
+  async function loadCalendarBookings() {
+    // Calculate date range based on current view
+    const { start, end } = getDateRange();
+    
     try {
-      await api.post("/bookings", {
-        cart_id: cartId,
-        user_id: userId,
-        start_datetime: new Date(start).toISOString(),
-        end_datetime: new Date(end).toISOString(),
+      const res = await api.get("/bookings/calendar", {
+        params: {
+          start_date: start.toISOString(),
+          end_date: end.toISOString(),
+        },
       });
-      await loadBookings(cartId);
-    } catch (e) {
-      setErr(e?.response?.data?.detail || "Fehler");
+
+      // Transform API data to calendar events
+      const calendarEvents = res.data.map((booking) => ({
+        id: booking.id,
+        title: `${booking.cart_name} - ${booking.participant_names.join(", ")}`,
+        start: new Date(booking.start_datetime),
+        end: new Date(booking.end_datetime),
+        resource: booking,
+      }));
+
+      setEvents(calendarEvents);
+    } catch (err) {
+      console.error("Error loading bookings:", err);
     }
+  }
+
+  function getDateRange() {
+    const start = moment(date).startOf(view === "month" ? "month" : "week").toDate();
+    const end = moment(date).endOf(view === "month" ? "month" : "week").toDate();
+    return { start, end };
+  }
+
+  function handleSelectSlot(slotInfo) {
+    // User clicked on empty slot - open booking modal
+    setSelectedSlot({
+      start: slotInfo.start,
+      end: slotInfo.end,
+    });
+    setShowModal(true);
+  }
+
+  function handleSelectEvent(event) {
+    // User clicked on existing booking - show details
+    alert(
+      `Buchung Details:\n` +
+      `Cart: ${event.resource.cart_name}\n` +
+      `Teilnehmer: ${event.resource.participant_names.join(", ")}\n` +
+      `Von: ${moment(event.start).format("DD.MM.YYYY HH:mm")}\n` +
+      `Bis: ${moment(event.end).format("DD.MM.YYYY HH:mm")}`
+    );
+  }
+
+  async function handleBookingCreate(bookingData) {
+    try {
+      await api.post("/bookings", bookingData);
+      setShowModal(false);
+      setSelectedSlot(null);
+      loadCalendarBookings(); // Reload calendar
+    } catch (err) {
+      throw err; // Let modal handle error display
+    }
+  }
+
+  // Custom event styling
+  function eventStyleGetter(event) {
+    const style = {
+      backgroundColor: "#171717",
+      borderRadius: "6px",
+      opacity: 0.9,
+      color: "white",
+      border: "0px",
+      display: "block",
+    };
+    return { style };
   }
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Cart buchen</h1>
-
-      <form onSubmit={submit} className="bg-white border rounded-xl p-4 space-y-3">
-        <select className="border rounded px-3 py-2 w-full" value={cartId}
-          onChange={(e)=>{setCartId(e.target.value); loadBookings(e.target.value);}} required>
-          <option value="">Cart wählen</option>
-          {carts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
-
-        <select className="border rounded px-3 py-2 w-full" value={userId}
-          onChange={(e)=>setUserId(e.target.value)} required>
-          <option value="">User wählen</option>
-          {users.map(u => <option key={u.id} value={u.id}>{u.firstname} {u.lastname}</option>)}
-        </select>
-
-        <div className="grid grid-cols-2 gap-2">
-          <input type="datetime-local" className="border rounded px-3 py-2" value={start}
-            onChange={(e)=>setStart(e.target.value)} required />
-          <input type="datetime-local" className="border rounded px-3 py-2" value={end}
-            onChange={(e)=>setEnd(e.target.value)} required />
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Cart Kalender</h1>
+        
+        {/* View Switcher */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setView("month")}
+            className={`px-3 py-1 rounded ${
+              view === "month"
+                ? "bg-neutral-900 text-white"
+                : "bg-neutral-100 hover:bg-neutral-200"
+            }`}
+          >
+            Monat
+          </button>
+          <button
+            onClick={() => setView("week")}
+            className={`px-3 py-1 rounded ${
+              view === "week"
+                ? "bg-neutral-900 text-white"
+                : "bg-neutral-100 hover:bg-neutral-200"
+            }`}
+          >
+            Woche
+          </button>
+          <button
+            onClick={() => setView("day")}
+            className={`px-3 py-1 rounded ${
+              view === "day"
+                ? "bg-neutral-900 text-white"
+                : "bg-neutral-100 hover:bg-neutral-200"
+            }`}
+          >
+            Tag
+          </button>
         </div>
-
-        <button className="bg-neutral-900 text-white rounded px-4 py-2">Buchen</button>
-        {err && <div className="text-sm text-red-600">{err}</div>}
-      </form>
-
-      <div className="bg-white border rounded-xl">
-        <div className="border-b p-3 font-medium">Aktuelle Buchungen</div>
-        <ul className="divide-y">
-          {bookings.map(b => (
-            <li key={b.id} className="p-3 text-sm">
-              {new Date(b.start_datetime).toLocaleString()} → {new Date(b.end_datetime).toLocaleString()}
-            </li>
-          ))}
-        </ul>
-        {bookings.length === 0 && <div className="p-3 text-sm text-neutral-500">Keine Buchungen</div>}
       </div>
+
+      {/* Calendar */}
+      <div className="bg-white border rounded-xl p-4" style={{ height: "600px" }}>
+        <Calendar
+          localizer={localizer}
+          events={events}
+          startAccessor="start"
+          endAccessor="end"
+          view={view}
+          onView={setView}
+          date={date}
+          onNavigate={setDate}
+          onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleSelectEvent}
+          selectable
+          eventPropGetter={eventStyleGetter}
+          messages={{
+            today: "Heute",
+            previous: "Zurück",
+            next: "Weiter",
+            month: "Monat",
+            week: "Woche",
+            day: "Tag",
+            agenda: "Agenda",
+            date: "Datum",
+            time: "Zeit",
+            event: "Buchung",
+            noEventsInRange: "Keine Buchungen in diesem Zeitraum",
+          }}
+          formats={{
+            timeGutterFormat: "HH:mm",
+            eventTimeRangeFormat: ({ start, end }) =>
+              `${moment(start).format("HH:mm")} - ${moment(end).format("HH:mm")}`,
+            agendaTimeRangeFormat: ({ start, end }) =>
+              `${moment(start).format("HH:mm")} - ${moment(end).format("HH:mm")}`,
+          }}
+        />
+      </div>
+
+      {/* Booking Modal */}
+      {showModal && (
+        <BookingModal
+          isOpen={showModal}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedSlot(null);
+          }}
+          selectedSlot={selectedSlot}
+          carts={carts}
+          users={users}
+          onSubmit={handleBookingCreate}
+        />
+      )}
     </div>
   );
 }

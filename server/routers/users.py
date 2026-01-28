@@ -21,6 +21,9 @@ from utils.usernames import (
     slugify_username,
     get_suggested_username,
 )
+from auth.deps import require_admin, get_current_user
+
+
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -41,6 +44,35 @@ def user_to_out(user: User) -> UserOut:
         created_at=user.created_at,
         has_password=user.password_hash is not None,
     )
+
+@router.get("/me", response_model=UserOut)
+def get_me(
+    payload=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    user = (
+        db.query(User)
+        .filter(User.id == payload["sub"])
+        .first()
+    )
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return user_to_out(user)
+
+
+
+@router.get("/bookable-users", response_model=list[UserOut])
+def list_bookable_users(
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return [
+        user_to_out(u)
+        for u in db.query(User).filter(User.active == True).all()
+    ]
+
 
 
 @router.get("", response_model=list[UserOut])
@@ -252,3 +284,5 @@ def delete_user(
     db.commit()
 
     return {"message": "User deleted"}
+
+

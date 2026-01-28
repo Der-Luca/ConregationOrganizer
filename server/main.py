@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from sqlalchemy import text
+from models.booking_participant import BookingParticipant
 from routers import carts, events
 from db.database import engine
 from db.base import Base
@@ -9,7 +10,6 @@ from routers import bookings
 from routers import users
 from routers import auth
 from routers import register
-
 
 
 app = FastAPI()

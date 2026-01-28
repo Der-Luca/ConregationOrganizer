@@ -1,0 +1,147 @@
+/* Custom styling for React Big Calendar */
+
+.rbc-calendar {
+  font-family: inherit;
+}
+
+.rbc-header {
+  padding: 12px 6px;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.rbc-today {
+  background-color: #fafafa;
+}
+
+.rbc-event {
+  padding: 4px 6px;
+  font-size: 0.875rem;
+}
+
+.rbc-event:hover {
+  opacity: 0.8;
+}
+
+.rbc-time-slot {
+  min-height: 40px;
+}
+
+.rbc-timeslot-group {
+  min-height: 80px;
+  border-left: 1px solid #e5e5e5;
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border-top: 1px solid #f5f5f5;
+}
+
+.rbc-time-header-content {
+  border-left: 1px solid #e5e5e5;
+}
+
+.rbc-toolbar {
+  padding: 12px 0;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rbc-toolbar button {
+  padding: 6px 12px;
+  border: 1px solid #e5e5e5;
+  background: white;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rbc-toolbar button:hover {
+  background: #f5f5f5;
+}
+
+.rbc-toolbar button.rbc-active {
+  background: #171717;
+  color: white;
+  border-color: #171717;
+}
+
+.rbc-toolbar-label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Selected slot highlighting */
+.rbc-slot-selecting {
+  background-color: rgba(23, 23, 23, 0.1);
+}
+
+.rbc-selected {
+  background-color: rgba(23, 23, 23, 0.15);
+}
+
+/* Month view */
+.rbc-month-view {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rbc-month-row {
+  border-top: 1px solid #e5e5e5;
+}
+
+.rbc-date-cell {
+  padding: 4px 8px;
+}
+
+.rbc-off-range {
+  color: #a3a3a3;
+}
+
+.rbc-off-range-bg {
+  background: #fafafa;
+}
+
+/* Week/Day view */
+.rbc-time-view {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rbc-time-content {
+  border-top: 1px solid #e5e5e5;
+}
+
+.rbc-current-time-indicator {
+  background-color: #ef4444;
+  height: 2px;
+}
+
+/* Event labels */
+.rbc-event-label {
+  font-size: 0.75rem;
+}
+
+/* Agenda view */
+.rbc-agenda-view {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rbc-agenda-table {
+  border-spacing: 0;
+}
+
+.rbc-agenda-date-cell,
+.rbc-agenda-time-cell,
+.rbc-agenda-event-cell {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f5f5f5;
+}
