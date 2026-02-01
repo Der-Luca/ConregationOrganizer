@@ -24,9 +24,16 @@ def get_current_user(
 
 
 def require_admin(current_user=Depends(get_current_user)):
-    # current_user ist bei dir aktuell entweder payload (dict) oder User-Objekt
-    role = current_user.get("role") if isinstance(current_user, dict) else getattr(current_user, "role", None)
+    roles = current_user.get("roles") if isinstance(current_user, dict) else getattr(current_user, "roles", [])
 
-    if role != "admin":
+    if "admin" not in (roles or []):
         raise HTTPException(status_code=403, detail="Admin only")
+    return current_user
+
+
+def require_fieldserviceplanner(current_user=Depends(get_current_user)):
+    roles = current_user.get("roles") if isinstance(current_user, dict) else getattr(current_user, "roles", [])
+
+    if "fieldserviceplanner" not in (roles or []) and "admin" not in (roles or []):
+        raise HTTPException(status_code=403, detail="Field service planner or admin only")
     return current_user

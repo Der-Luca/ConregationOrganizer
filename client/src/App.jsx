@@ -13,6 +13,9 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import UserCarts from "./pages/user/UserCarts";
 import UserEvents from "./pages/user/UserEvents";
 import UserBookings from "./pages/user/UserBookings";
+import MeetingPoints from "./pages/user/MeetingPoints";
+import MeetingPointStats from "./pages/user/MeetingPointStats";
+import Dashboard from "./pages/user/Dashboard";
 
 export default function App() {
   return (
@@ -30,9 +33,12 @@ export default function App() {
           </ProtectedRoute>
         }
       >
+        <Route index element={<Dashboard />} />
         <Route path="carts" element={<UserCarts />} />
         <Route path="events" element={<UserEvents />} />
         <Route path="bookings" element={<UserBookings />} />
+        <Route path="meeting-points" element={<MeetingPoints />} />
+        <Route path="meeting-points/stats" element={<MeetingPointStats />} />
       </Route>
 
       {/* ADMIN (nur Admins) */}

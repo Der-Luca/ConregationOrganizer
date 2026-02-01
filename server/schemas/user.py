@@ -3,6 +3,8 @@ from uuid import UUID
 from datetime import datetime
 from typing import Optional
 
+from models.user import VALID_ROLES
+
 
 class UserOut(BaseModel):
     id: UUID
@@ -10,7 +12,7 @@ class UserOut(BaseModel):
     lastname: str
     username: str
     email: Optional[str] = None
-    role: str
+    roles: list[str]
     active: bool
     created_at: datetime
     has_password: bool = False  # Indicates if user has completed registration
@@ -24,13 +26,28 @@ class UserCreate(BaseModel):
     lastname: str
     email: Optional[EmailStr] = None  # Optional
     username: Optional[str] = None  # Auto-generated if not provided
-    role: str = "user"
+    roles: list[str] = ["publisher"]
 
-    @field_validator("role")
+    @field_validator("roles")
     @classmethod
-    def validate_role(cls, v):
-        if v not in ("user", "admin"):
-            raise ValueError("Role must be 'user' or 'admin'")
+    def validate_roles(cls, v):
+        for role in v:
+            if role not in VALID_ROLES:
+                raise ValueError(f"Invalid role: {role}. Must be one of {sorted(VALID_ROLES)}")
+        return v
+
+
+class UserUpdateRoles(BaseModel):
+    roles: list[str]
+
+    @field_validator("roles")
+    @classmethod
+    def validate_roles(cls, v):
+        if not v:
+            raise ValueError("At least one role is required")
+        for role in v:
+            if role not in VALID_ROLES:
+                raise ValueError(f"Invalid role: {role}. Must be one of {sorted(VALID_ROLES)}")
         return v
 
 

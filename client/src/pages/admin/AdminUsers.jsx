@@ -7,11 +7,13 @@ export default function AdminUsers() {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
-  const [role, setRole] = useState("user");
+  const [roles, setRoles] = useState(["publisher"]);
   const [usernameStatus, setUsernameStatus] = useState(null); // null | "checking" | "available" | "taken"
   const [usernameSuggestion, setUsernameSuggestion] = useState(null);
   const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState(null);
+  const [editingRolesId, setEditingRolesId] = useState(null);
+  const [editingRoles, setEditingRoles] = useState([]);
 
   async function loadUsers() {
     const res = await api.get("/users");
@@ -71,7 +73,7 @@ export default function AdminUsers() {
         lastname,
         email: email || undefined,
         username: username || undefined,
-        role,
+        roles,
       });
 
       // Copy invite URL to clipboard
@@ -83,7 +85,7 @@ export default function AdminUsers() {
       setLastname("");
       setEmail("");
       setUsername("");
-      setRole("user");
+      setRoles(["publisher"]);
       setUsernameStatus(null);
       setUsernameSuggestion(null);
 
@@ -93,6 +95,17 @@ export default function AdminUsers() {
     } catch (err) {
       const msg = err?.response?.data?.detail || "Failed to create user";
       setError(typeof msg === "string" ? msg : "Failed to create user");
+    }
+  }
+
+  async function saveRoles(userId) {
+    try {
+      await api.patch(`/users/${userId}/roles`, { roles: editingRoles });
+      setEditingRolesId(null);
+      loadUsers();
+    } catch (err) {
+      const msg = err?.response?.data?.detail || "Failed to update roles";
+      alert(typeof msg === "string" ? msg : "Failed to update roles");
     }
   }
 
@@ -218,14 +231,27 @@ export default function AdminUsers() {
           </button>
         )}
 
-        <select
-          className="border rounded px-3 py-2 w-full"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-        >
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
+        <div className="space-y-1">
+          <div className="text-sm text-black/60">Roles</div>
+          <div className="flex flex-wrap gap-3">
+            {["publisher", "cartplanner", "fieldserviceplanner", "admin"].map((r) => (
+              <label key={r} className="flex items-center gap-1.5 text-sm">
+                <input
+                  type="checkbox"
+                  checked={roles.includes(r)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setRoles([...roles, r]);
+                    } else {
+                      setRoles(roles.filter((x) => x !== r));
+                    }
+                  }}
+                />
+                {r}
+              </label>
+            ))}
+          </div>
+        </div>
 
         <button
           type="submit"
@@ -259,15 +285,24 @@ export default function AdminUsers() {
                   <td className="p-3 font-mono text-black/60">{user.username}</td>
                   <td className="p-3 text-black/60">{user.email || "-"}</td>
                   <td className="p-3">
-                    <span
-                      className={`px-2 py-0.5 rounded text-xs ${
-                        user.role === "admin"
-                          ? "bg-purple-100 text-purple-700"
-                          : "bg-neutral-100 text-neutral-600"
-                      }`}
-                    >
-                      {user.role}
-                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {(user.roles || []).map((r) => (
+                        <span
+                          key={r}
+                          className={`px-2 py-0.5 rounded text-xs ${
+                            r === "admin"
+                              ? "bg-purple-100 text-purple-700"
+                              : r === "cartplanner"
+                              ? "bg-blue-100 text-blue-700"
+                              : r === "fieldserviceplanner"
+                              ? "bg-teal-100 text-teal-700"
+                              : "bg-neutral-100 text-neutral-600"
+                          }`}
+                        >
+                          {r}
+                        </span>
+                      ))}
+                    </div>
                   </td>
                   <td className="p-3">
                     {!user.active ? (
@@ -288,34 +323,82 @@ export default function AdminUsers() {
                     {user.username === "congregation-admin" ? (
                       <span className="text-xs text-black/40">Protected</span>
                     ) : (
-                      <div className="flex gap-2 flex-wrap">
-                        {!user.has_password ? (
+                      <div className="space-y-2">
+                        <div className="flex gap-2 flex-wrap">
+                          {!user.has_password ? (
+                            <button
+                              onClick={() => copyInviteLink(user.id)}
+                              className="text-blue-600 hover:underline text-sm"
+                            >
+                              {copiedId === user.id ? "Copied!" : "Copy Link"}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => resetPassword(user.id, user.firstname)}
+                              className="text-blue-600 hover:underline text-sm"
+                            >
+                              Reset Password
+                            </button>
+                          )}
                           <button
-                            onClick={() => copyInviteLink(user.id)}
-                            className="text-blue-600 hover:underline text-sm"
+                            onClick={() => {
+                              setEditingRolesId(editingRolesId === user.id ? null : user.id);
+                              setEditingRoles(user.roles || []);
+                            }}
+                            className="text-purple-600 hover:underline text-sm"
                           >
-                            {copiedId === user.id ? "Copied!" : "Copy Link"}
+                            Roles
                           </button>
-                        ) : (
                           <button
-                            onClick={() => resetPassword(user.id, user.firstname)}
-                            className="text-blue-600 hover:underline text-sm"
+                            onClick={() => toggleActive(user.id, user.active)}
+                            className="text-orange-600 hover:underline text-sm"
                           >
-                            Reset Password
+                            {user.active ? "Deactivate" : "Activate"}
                           </button>
+                          <button
+                            onClick={() => deleteUser(user.id, user.username)}
+                            className="text-red-600 hover:underline text-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                        {editingRolesId === user.id && (
+                          <div className="border rounded p-2 bg-neutral-50 space-y-2">
+                            <div className="flex flex-wrap gap-2">
+                              {["publisher", "cartplanner", "fieldserviceplanner", "admin"].map((r) => (
+                                <label key={r} className="flex items-center gap-1 text-xs">
+                                  <input
+                                    type="checkbox"
+                                    checked={editingRoles.includes(r)}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setEditingRoles([...editingRoles, r]);
+                                      } else {
+                                        setEditingRoles(editingRoles.filter((x) => x !== r));
+                                      }
+                                    }}
+                                  />
+                                  {r}
+                                </label>
+                              ))}
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => saveRoles(user.id)}
+                                disabled={editingRoles.length === 0}
+                                className="bg-black text-white px-2 py-1 rounded text-xs disabled:opacity-50"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={() => setEditingRolesId(null)}
+                                className="text-xs text-black/60 hover:underline"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
                         )}
-                        <button
-                          onClick={() => toggleActive(user.id, user.active)}
-                          className="text-orange-600 hover:underline text-sm"
-                        >
-                          {user.active ? "Deactivate" : "Activate"}
-                        </button>
-                        <button
-                          onClick={() => deleteUser(user.id, user.username)}
-                          className="text-red-600 hover:underline text-sm"
-                        >
-                          Delete
-                        </button>
                       </div>
                     )}
                   </td>

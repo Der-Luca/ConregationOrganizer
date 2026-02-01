@@ -10,9 +10,12 @@ export default function ProtectedRoute({ children, requireRole }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requireRole && user?.role !== requireRole) {
-    // eingeloggter User, aber falsche Rolle
-    return <Navigate to="/user" replace />;
+  if (requireRole) {
+    const roles = user?.roles || [];
+    // admin has access to everything
+    if (!roles.includes(requireRole) && !roles.includes("admin")) {
+      return <Navigate to="/user" replace />;
+    }
   }
 
   return children;

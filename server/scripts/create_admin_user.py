@@ -53,7 +53,7 @@ def main():
             print("✅ Admin already exists.")
             print(f"   Email: {existing.email}")
             print(f"   Username: {getattr(existing, 'username', '(missing)')}")
-            print(f"   Role: {existing.role}")
+            print(f"   Roles: {existing.roles}")
             db.close()
             return
 
@@ -65,7 +65,7 @@ def main():
             firstname=firstname,
             lastname=lastname,
             password_hash=hash_plain_password(pw),
-            role="admin",
+            roles=["admin", "publisher"],
             active=True,
         )
 

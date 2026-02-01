@@ -26,7 +26,7 @@ export default function Login() {
 
   // Redirect as soon as auth state is available
 useEffect(() => {
-  if (!isAuthenticated || !user?.role) return;
+  if (!isAuthenticated || !user?.roles) return;
   navigate("/user", { replace: true });
 }, [isAuthenticated, user, navigate]);
 

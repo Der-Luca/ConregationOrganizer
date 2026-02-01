@@ -10,6 +10,7 @@ from routers import bookings
 from routers import users
 from routers import auth
 from routers import register
+from routers import meeting_points
 
 
 app = FastAPI()
@@ -37,6 +38,7 @@ app.include_router(carts.router)
 app.include_router(events.router)
 app.include_router(bookings.router)
 app.include_router(register.router)
+app.include_router(meeting_points.router)
 
 app.add_middleware(
     CORSMiddleware,

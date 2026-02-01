@@ -15,6 +15,7 @@ from models.cart_booking import CartBooking
 from models.booking_participant import BookingParticipant
 from models.event import Event
 from models.refresh_token import RefreshToken
+from models.meeting_point import MeetingPoint
 
 # this is the Alembic Config object
 config = context.config

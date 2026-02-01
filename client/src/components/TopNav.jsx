@@ -50,14 +50,16 @@ export default function TopNav() {
 
             {/* Desktop Nav Links */}
             <div className="hidden md:flex items-center space-x-6">
+              <NavLink to="/user" end className={navLinkClass}>Inicio</NavLink>
               <NavLink to="/user/carts" className={navLinkClass}>Carts</NavLink>
               <NavLink to="/user/events" className={navLinkClass}>Events</NavLink>
               <NavLink to="/user/bookings" className={navLinkClass}>Bookings</NavLink>
-              
-              {user?.role === "admin" && (
-                <NavLink 
-                  to="/admin" 
-                  className={({ isActive }) => 
+              <NavLink to="/user/meeting-points" className={navLinkClass}>Puntos de Encuentro</NavLink>
+
+              {user?.roles?.includes("admin") && (
+                <NavLink
+                  to="/admin"
+                  className={({ isActive }) =>
                     `px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
                       isActive ? "bg-black text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`
@@ -83,7 +85,7 @@ export default function TopNav() {
                     {user?.username || "User"}
                   </p>
                   <p className="text-xs text-gray-500 uppercase tracking-wider">
-                    {user?.role || "Member"}
+                    {user?.roles?.join(", ") || "Member"}
                   </p>
                 </div>
                 {/* Avatar Circle */}
@@ -135,6 +137,9 @@ export default function TopNav() {
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
           <div className="px-4 pt-4 pb-2 space-y-2">
             <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Menu</p>
+            <NavLink to="/user" end onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50"}`}>
+              Inicio
+            </NavLink>
             <NavLink to="/user/carts" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50"}`}>
               Carts
             </NavLink>
@@ -144,8 +149,11 @@ export default function TopNav() {
             <NavLink to="/user/bookings" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50"}`}>
               Bookings
             </NavLink>
+            <NavLink to="/user/meeting-points" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50"}`}>
+              Puntos de Encuentro
+            </NavLink>
 
-            {user?.role === "admin" && (
+            {user?.roles?.includes("admin") && (
               <NavLink to="/admin" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 bg-gray-100 mt-2">
                 Admin Panel
               </NavLink>
@@ -161,7 +169,7 @@ export default function TopNav() {
               </div>
               <div className="ml-3">
                 <div className="text-base font-medium text-gray-800">{user?.username}</div>
-                <div className="text-sm font-medium text-gray-500">{user?.role}</div>
+                <div className="text-sm font-medium text-gray-500">{user?.roles?.join(", ")}</div>
               </div>
             </div>
             <button

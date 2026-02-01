@@ -10,49 +10,63 @@ export function AuthProvider({ children }) {
 
   const isAuthenticated = !!accessToken;
 
-  // 🔁 Restore login on page reload
+  function parseJwtPayload(token) {
+    try {
+      const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(atob(base64));
+    } catch {
+      return null;
+    }
+  }
+
+  // Restore login on page reload
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    const role = localStorage.getItem("user_role");
+    const rolesJson = localStorage.getItem("user_roles");
 
-    if (token && role) {
+    if (token && rolesJson) {
       setAccessToken(token);
-      setUser({ role });
+      try {
+        const payload = parseJwtPayload(token);
+        setUser({ roles: JSON.parse(rolesJson), id: payload?.sub || null });
+      } catch {
+        localStorage.removeItem("user_roles");
+      }
     }
 
     setLoading(false);
   }, []);
 
-  // 🔐 LOGIN
+  // LOGIN
   async function login(identifier, password) {
     const res = await api.post("/auth/login", {
       identifier,
       password,
     });
 
-    const { access_token, role } = res.data;
+    const { access_token, roles } = res.data;
 
     localStorage.setItem("access_token", access_token);
-    localStorage.setItem("user_role", role);
+    localStorage.setItem("user_roles", JSON.stringify(roles));
 
     setAccessToken(access_token);
-    setUser({ role });
+    const payload = parseJwtPayload(access_token);
+    setUser({ roles, id: payload?.sub || null });
   }
 
-  // 🚪 LOGOUT
+  // LOGOUT
   async function logout() {
     try {
-      // optional – Backend-Logout
       const refreshToken = localStorage.getItem("refresh_token");
       if (refreshToken) {
         await api.post("/auth/logout", { refresh_token: refreshToken });
       }
     } catch (_) {
-      // egal – wir loggen lokal trotzdem aus
+      // ignore – log out locally regardless
     }
 
     localStorage.removeItem("access_token");
-    localStorage.removeItem("user_role");
+    localStorage.removeItem("user_roles");
     localStorage.removeItem("refresh_token");
 
     setAccessToken(null);

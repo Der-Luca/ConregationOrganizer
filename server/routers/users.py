@@ -12,6 +12,7 @@ from schemas.user import (
     UserOut,
     UserCreate,
     UserCreateResponse,
+    UserUpdateRoles,
     UsernameCheckResponse,
 )
 from auth.deps import require_admin
@@ -39,7 +40,7 @@ def user_to_out(user: User) -> UserOut:
         lastname=user.lastname,
         username=user.username,
         email=user.email,
-        role=user.role,
+        roles=user.roles,
         active=user.active,
         created_at=user.created_at,
         has_password=user.password_hash is not None,
@@ -137,7 +138,7 @@ def create_user(
         lastname=data.lastname,
         email=data.email,
         username=username,
-        role=data.role,
+        roles=data.roles,
         password_hash=None,  # Will be set during registration
     )
     db.add(user)
@@ -255,6 +256,29 @@ def update_user(
     if active is not None:
         user.active = active
 
+    db.commit()
+    db.refresh(user)
+
+    return user_to_out(user)
+
+
+@router.patch("/{user_id}/roles", response_model=UserOut)
+def update_user_roles(
+    user_id: UUID,
+    data: UserUpdateRoles,
+    db: Session = Depends(get_db),
+    _admin=Depends(require_admin),
+):
+    """Update a user's roles (admin only)."""
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user.username == PROTECTED_USERNAME:
+        raise HTTPException(status_code=403, detail="Cannot modify the main admin account")
+
+    user.roles = data.roles
     db.commit()
     db.refresh(user)
 

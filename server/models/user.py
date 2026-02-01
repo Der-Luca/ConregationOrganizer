@@ -1,9 +1,12 @@
 import uuid
 from sqlalchemy import Column, String, Boolean, DateTime
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.sql import func
 
-from db.base import Base   # 👈 DAS hat gefehlt
+from db.base import Base
+
+
+VALID_ROLES = {"publisher", "cartplanner", "fieldserviceplanner", "admin"}
 
 
 class User(Base):
@@ -19,7 +22,7 @@ class User(Base):
 
     password_hash = Column(String, nullable=True)  # Nullable for invited users
 
-    role = Column(String, nullable=False, default="user")
+    roles = Column(ARRAY(String), nullable=False, default=["publisher"])
     active = Column(Boolean, default=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())

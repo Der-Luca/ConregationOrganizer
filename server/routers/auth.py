@@ -29,7 +29,7 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
-    role: str
+    roles: list[str]
 
 
 class RefreshRequest(BaseModel):
@@ -39,7 +39,7 @@ class RefreshRequest(BaseModel):
 class RefreshResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
-    role: str
+    roles: list[str]
 
 
 # ------------------------------------------------------------------
@@ -71,7 +71,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     access_token = create_access_token(
         {
             "sub": str(user.id),
-            "role": user.role,
+            "roles": user.roles,
         }
     )
 
@@ -89,7 +89,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
 
     return {
         "access_token": access_token,
-        "role": user.role,
+        "roles": user.roles,
     }
 
 
@@ -126,13 +126,13 @@ def refresh(data: RefreshRequest, db: Session = Depends(get_db)):
     new_access_token = create_access_token(
         {
             "sub": str(user.id),
-            "role": user.role,
+            "roles": user.roles,
         }
     )
 
     return {
         "access_token": new_access_token,
-        "role": user.role,
+        "roles": user.roles,
     }
 
 

@@ -30,7 +30,7 @@ def main():
             print("❌ Admin user not found.")
             return
 
-        if user.role != "admin":
+        if "admin" not in (user.roles or []):
             print("❌ The selected user is not an admin.")
             return
 
