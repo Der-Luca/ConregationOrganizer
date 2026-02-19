@@ -36,6 +36,18 @@ export function AuthProvider({ children }) {
     setAuthToken(null);
   }
 
+  async function loadMe() {
+    try {
+      const res = await api.get("/users/me");
+      setUser((prev) => ({
+        ...(prev || {}),
+        ...res.data,
+      }));
+    } catch {
+      // ignore
+    }
+  }
+
   // Restore login on page reload
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -61,6 +73,12 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
+  useEffect(() => {
+    if (accessToken) {
+      loadMe();
+    }
+  }, [accessToken]);
+
   // LOGIN
   async function login(identifier, password) {
     const res = await api.post("/auth/login", {
@@ -84,6 +102,7 @@ export function AuthProvider({ children }) {
     setAuthToken(access_token);
     const payload = parseJwtPayload(access_token);
     setUser({ roles, id: payload?.sub || null });
+    await loadMe();
   }
 
   // LOGOUT

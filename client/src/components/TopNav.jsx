@@ -37,6 +37,13 @@ export default function TopNav() {
     .map((r) => ROLE_LABELS[r] || r)
     .join(", ") || "Usuario";
 
+  const displayName =
+    user?.firstname ||
+    user?.username ||
+    "Usuario";
+  const displayInitial =
+    (displayName || "U").charAt(0).toUpperCase();
+
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -63,9 +70,9 @@ export default function TopNav() {
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 className="flex items-center gap-3 focus:outline-none group"
               >
-                <div className="text-right hidden lg:block">
+                <div className="text-right">
                   <p className="text-sm font-medium text-gray-900 group-hover:text-gray-700 transition-colors">
-                    {user?.username || "User"}
+                    Hola, {displayName}
                   </p>
                   <p className="text-xs text-gray-500 uppercase tracking-wider">
                     {roleLabel}
@@ -74,7 +81,7 @@ export default function TopNav() {
                 {/* Avatar Circle */}
                 <div className="h-10 w-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-700 group-hover:border-gray-300 transition-all">
                   <span className="text-lg font-semibold">
-                    {user?.username?.charAt(0).toUpperCase() || "U"}
+                    {displayInitial}
                   </span>
                 </div>
               </button>
@@ -83,7 +90,7 @@ export default function TopNav() {
               {userDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-sm border border-gray-200 py-1 origin-top-right animate-in fade-in zoom-in-95 duration-100">
                   <div className="px-4 py-3 border-b border-gray-50">
-                    <p className="text-sm font-medium text-gray-900">{user?.username}</p>
+                    <p className="text-sm font-medium text-gray-900">{displayName}</p>
                     <p className="text-xs text-gray-500 truncate">{roleLabel}</p>
                   </div>
 
