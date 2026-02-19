@@ -9,6 +9,7 @@ import UserLayout from "./layout/UserLayout";
 
 import AdminCarts from "./pages/admin/AdminCarts";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminHome from "./pages/admin/AdminHome";
 import CartSchedule from "./pages/user/CartSchedule";
 import MyAssignments from "./pages/user/MyAssignments";
 import MeetingPoints from "./pages/user/MeetingPoints";
@@ -57,6 +58,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
+        <Route index element={<AdminHome />} />
         <Route path="carts" element={<AdminCarts />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="stats" element={<Stats />} />
