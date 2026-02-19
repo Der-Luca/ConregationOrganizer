@@ -31,6 +31,14 @@ def require_admin(current_user=Depends(get_current_user)):
     return current_user
 
 
+def require_cartplanner(current_user=Depends(get_current_user)):
+    roles = current_user.get("roles") if isinstance(current_user, dict) else getattr(current_user, "roles", [])
+
+    if "cartplanner" not in (roles or []) and "admin" not in (roles or []):
+        raise HTTPException(status_code=403, detail="Cart planner or admin only")
+    return current_user
+
+
 def require_fieldserviceplanner(current_user=Depends(get_current_user)):
     roles = current_user.get("roles") if isinstance(current_user, dict) else getattr(current_user, "roles", [])
 

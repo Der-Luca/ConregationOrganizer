@@ -200,6 +200,7 @@ def create_meeting_point(
         month=data.date.strftime("%Y-%m"),
     )
     db.add(mp)
+    db.flush()
     db.commit()
     db.refresh(mp)
     return _to_out(mp)

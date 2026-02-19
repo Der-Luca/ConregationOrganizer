@@ -10,12 +10,14 @@ import UserLayout from "./layout/UserLayout";
 import AdminCarts from "./pages/admin/AdminCarts";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminUsers from "./pages/admin/AdminUsers";
-import UserCarts from "./pages/user/UserCarts";
 import UserEvents from "./pages/user/UserEvents";
-import UserBookings from "./pages/user/UserBookings";
+import CartSchedule from "./pages/user/CartSchedule";
+import MyAssignments from "./pages/user/MyAssignments";
 import MeetingPoints from "./pages/user/MeetingPoints";
 import MeetingPointStats from "./pages/user/MeetingPointStats";
 import Dashboard from "./pages/user/Dashboard";
+import Stats from "./pages/shared/Stats";
+import Absences from "./pages/user/Absences";
 
 export default function App() {
   return (
@@ -34,11 +36,13 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
-        <Route path="carts" element={<UserCarts />} />
         <Route path="events" element={<UserEvents />} />
-        <Route path="bookings" element={<UserBookings />} />
+        <Route path="cart-schedule" element={<CartSchedule />} />
+        <Route path="my-assignments" element={<MyAssignments />} />
         <Route path="meeting-points" element={<MeetingPoints />} />
         <Route path="meeting-points/stats" element={<MeetingPointStats />} />
+        <Route path="stats" element={<Stats />} />
+        <Route path="absences" element={<Absences />} />
       </Route>
 
       {/* ADMIN (nur Admins) */}
@@ -53,6 +57,7 @@ export default function App() {
         <Route path="carts" element={<AdminCarts />} />
         <Route path="events" element={<AdminEvents />} />
         <Route path="users" element={<AdminUsers />} />
+        <Route path="stats" element={<Stats />} />
       </Route>
 
       {/* FALLBACK */}

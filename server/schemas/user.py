@@ -12,6 +12,7 @@ class UserOut(BaseModel):
     lastname: str
     username: str
     email: Optional[str] = None
+    gender: Optional[str] = None
     roles: list[str]
     active: bool
     created_at: datetime
@@ -26,6 +27,7 @@ class UserCreate(BaseModel):
     lastname: str
     email: Optional[EmailStr] = None  # Optional
     username: Optional[str] = None  # Auto-generated if not provided
+    gender: Optional[str] = None  # "male" / "female"
     roles: list[str] = ["publisher"]
 
     @field_validator("roles")

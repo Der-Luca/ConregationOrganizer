@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import  api  from "../api";
+import api from "../api";
 
 const AuthContext = createContext(null);
 
@@ -19,6 +19,23 @@ export function AuthProvider({ children }) {
     }
   }
 
+  function setAuthToken(token) {
+    if (token) {
+      api.defaults.headers.common.Authorization = `Bearer ${token}`;
+    } else {
+      delete api.defaults.headers.common.Authorization;
+    }
+  }
+
+  function clearAuth() {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user_roles");
+    localStorage.removeItem("refresh_token");
+    setAccessToken(null);
+    setUser(null);
+    setAuthToken(null);
+  }
+
   // Restore login on page reload
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -26,11 +43,18 @@ export function AuthProvider({ children }) {
 
     if (token && rolesJson) {
       setAccessToken(token);
+      setAuthToken(token);
       try {
         const payload = parseJwtPayload(token);
+        const exp = payload?.exp;
+        if (exp && Date.now() / 1000 >= exp) {
+          clearAuth();
+          setLoading(false);
+          return;
+        }
         setUser({ roles: JSON.parse(rolesJson), id: payload?.sub || null });
       } catch {
-        localStorage.removeItem("user_roles");
+        clearAuth();
       }
     }
 
@@ -46,10 +70,18 @@ export function AuthProvider({ children }) {
 
     const { access_token, roles } = res.data;
 
+    if (!access_token) {
+      throw new Error("Missing access token in response");
+    }
+
     localStorage.setItem("access_token", access_token);
     localStorage.setItem("user_roles", JSON.stringify(roles));
+    if (res.data?.refresh_token) {
+      localStorage.setItem("refresh_token", res.data.refresh_token);
+    }
 
     setAccessToken(access_token);
+    setAuthToken(access_token);
     const payload = parseJwtPayload(access_token);
     setUser({ roles, id: payload?.sub || null });
   }
@@ -65,12 +97,7 @@ export function AuthProvider({ children }) {
       // ignore – log out locally regardless
     }
 
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user_roles");
-    localStorage.removeItem("refresh_token");
-
-    setAccessToken(null);
-    setUser(null);
+    clearAuth();
   }
 
   return (

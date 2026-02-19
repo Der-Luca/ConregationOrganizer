@@ -7,6 +7,12 @@ export default function MeetingPointModal({ isOpen, onClose, onSaved, editData }
   const [conductorStats, setConductorStats] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const timeOptions = Array.from({ length: 24 * 4 }, (_, i) => {
+    const hours = String(Math.floor(i / 4)).padStart(2, "0");
+    const minutes = String((i % 4) * 15).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  });
+
   const [form, setForm] = useState({
     date: "",
     time: "",
@@ -100,7 +106,12 @@ export default function MeetingPointModal({ isOpen, onClose, onSaved, editData }
       onSaved();
       onClose();
     } catch (err) {
-      alert(err.response?.data?.detail || "Error al guardar");
+      const detail = err?.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        alert("Datos inválidos. Revisa fecha y hora.");
+      } else {
+        alert(detail || "Error al guardar");
+      }
     } finally {
       setLoading(false);
     }
@@ -209,7 +220,14 @@ export default function MeetingPointModal({ isOpen, onClose, onSaved, editData }
               onChange={handleChange}
               required={!editData}
               className={inputClass}
+              list="meeting-time-options"
+              step="60"
             />
+            <datalist id="meeting-time-options">
+              {timeOptions.map((t) => (
+                <option key={t} value={t} />
+              ))}
+            </datalist>
           </div>
 
           <div>

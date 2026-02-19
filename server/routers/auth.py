@@ -85,6 +85,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
             revoked=False,
         )
     )
+
     db.commit()
 
     return {

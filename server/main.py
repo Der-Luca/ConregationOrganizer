@@ -1,16 +1,17 @@
 from fastapi import FastAPI
 from sqlalchemy import text
-from models.booking_participant import BookingParticipant
 from routers import carts, events
 from db.database import engine
 from db.base import Base
-import models  # wichtig: triggert Model-Imports
+import models  # triggers model imports
 from fastapi.middleware.cors import CORSMiddleware
-from routers import bookings
+from routers import cart_sessions
 from routers import users
 from routers import auth
 from routers import register
 from routers import meeting_points
+from routers import stats
+from routers import absences
 
 
 app = FastAPI()
@@ -36,9 +37,11 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(carts.router)
 app.include_router(events.router)
-app.include_router(bookings.router)
+app.include_router(cart_sessions.router)
 app.include_router(register.router)
 app.include_router(meeting_points.router)
+app.include_router(stats.router)
+app.include_router(absences.router)
 
 app.add_middleware(
     CORSMiddleware,

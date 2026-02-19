@@ -19,6 +19,7 @@ class User(Base):
 
     username = Column(String, unique=True, nullable=False, index=True)
     email = Column(String, unique=True, nullable=True, index=True)  # Optional
+    gender = Column(String, nullable=True)  # "male" / "female" / None
 
     password_hash = Column(String, nullable=True)  # Nullable for invited users
 

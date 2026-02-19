@@ -17,10 +17,8 @@ from schemas.user import (
 )
 from auth.deps import require_admin
 from utils.usernames import (
-    generate_unique_username,
     is_username_available,
     slugify_username,
-    get_suggested_username,
 )
 from auth.deps import require_admin, get_current_user
 
@@ -40,6 +38,7 @@ def user_to_out(user: User) -> UserOut:
         lastname=user.lastname,
         username=user.username,
         email=user.email,
+        gender=user.gender,
         roles=user.roles,
         active=user.active,
         created_at=user.created_at,
@@ -104,7 +103,7 @@ def check_username(
 
     return UsernameCheckResponse(
         available=available,
-        suggestion=None if available else get_suggested_username(slug, db),
+        suggestion=None,
     )
 
 
@@ -130,7 +129,12 @@ def create_user(
         username = slug
     else:
         # Auto-generate from firstname
-        username = generate_unique_username(data.firstname, db)
+        slug = slugify_username(data.firstname)
+        if not slug:
+            raise HTTPException(status_code=400, detail="Username invalid")
+        if not is_username_available(slug, db):
+            raise HTTPException(status_code=400, detail="Username already taken")
+        username = slug
 
     # Create user without password
     user = User(
@@ -138,6 +142,7 @@ def create_user(
         lastname=data.lastname,
         email=data.email,
         username=username,
+        gender=data.gender,
         roles=data.roles,
         password_hash=None,  # Will be set during registration
     )
@@ -262,6 +267,27 @@ def update_user(
     return user_to_out(user)
 
 
+@router.patch("/{user_id}/gender", response_model=UserOut)
+def update_user_gender(
+    user_id: UUID,
+    gender: str = Query(None, description="male or female"),
+    db: Session = Depends(get_db),
+    _admin=Depends(require_admin),
+):
+    """Update a user's gender (admin only)."""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if gender is not None and gender != "" and gender not in ("male", "female"):
+        raise HTTPException(status_code=400, detail="Gender must be 'male' or 'female'")
+
+    user.gender = gender if gender in ("male", "female") else None
+    db.commit()
+    db.refresh(user)
+    return user_to_out(user)
+
+
 @router.patch("/{user_id}/roles", response_model=UserOut)
 def update_user_roles(
     user_id: UUID,
@@ -308,5 +334,3 @@ def delete_user(
     db.commit()
 
     return {"message": "User deleted"}
-
-

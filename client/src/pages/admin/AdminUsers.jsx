@@ -7,13 +7,17 @@ export default function AdminUsers() {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [gender, setGender] = useState("");
   const [roles, setRoles] = useState(["publisher"]);
   const [usernameStatus, setUsernameStatus] = useState(null); // null | "checking" | "available" | "taken"
   const [usernameSuggestion, setUsernameSuggestion] = useState(null);
   const [error, setError] = useState("");
+  const [usernameTouched, setUsernameTouched] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
   const [editingRolesId, setEditingRolesId] = useState(null);
   const [editingRoles, setEditingRoles] = useState([]);
+  const [editingGenderId, setEditingGenderId] = useState(null);
+  const [editingGender, setEditingGender] = useState("");
 
   async function loadUsers() {
     const res = await api.get("/users");
@@ -24,19 +28,24 @@ export default function AdminUsers() {
     loadUsers();
   }, []);
 
-  // Auto-generate username from firstname
+  // Auto-generate username from firstname unless user edited it manually
   useEffect(() => {
-    if (firstname && !username) {
-      const slug = firstname
-        .toLowerCase()
-        .normalize("NFKD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]/g, "-")
-        .replace(/-+/g, "-")
-        .replace(/^-|-$/g, "");
-      setUsername(slug);
+    if (usernameTouched) return;
+
+    if (!firstname) {
+      setUsername("");
+      return;
     }
-  }, [firstname]);
+
+    const slug = firstname
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+    setUsername(slug);
+  }, [firstname, usernameTouched]);
 
   // Check username availability with debounce
   const checkUsername = useCallback(async (value) => {
@@ -73,6 +82,7 @@ export default function AdminUsers() {
         lastname,
         email: email || undefined,
         username: username || undefined,
+        gender: gender || undefined,
         roles,
       });
 
@@ -85,6 +95,8 @@ export default function AdminUsers() {
       setLastname("");
       setEmail("");
       setUsername("");
+      setUsernameTouched(false);
+      setGender("");
       setRoles(["publisher"]);
       setUsernameStatus(null);
       setUsernameSuggestion(null);
@@ -106,6 +118,17 @@ export default function AdminUsers() {
     } catch (err) {
       const msg = err?.response?.data?.detail || "Failed to update roles";
       alert(typeof msg === "string" ? msg : "Failed to update roles");
+    }
+  }
+
+  async function saveGender(userId) {
+    try {
+      await api.patch(`/users/${userId}/gender?gender=${editingGender || ""}`);
+      setEditingGenderId(null);
+      loadUsers();
+    } catch (err) {
+      const msg = err?.response?.data?.detail || "Failed to update gender";
+      alert(typeof msg === "string" ? msg : "Failed to update gender");
     }
   }
 
@@ -163,27 +186,30 @@ export default function AdminUsers() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Admin – Users</h1>
+      <div>
+        <h1 className="text-2xl font-semibold text-gray-900">Admin – Users</h1>
+        <p className="text-sm text-gray-500">Create, manage, and invite users.</p>
+      </div>
 
-      <form onSubmit={handleCreate} className="border rounded-xl p-4 space-y-3 bg-white">
-        <div className="text-sm font-medium text-black/60 mb-2">Create New User</div>
+      <form onSubmit={handleCreate} className="border border-gray-200 rounded-2xl p-6 space-y-4 bg-white shadow-sm">
+        <div className="text-sm font-semibold text-gray-900">Create New User</div>
 
         {error && (
-          <div className="text-sm rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+          <div className="text-sm rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-red-700">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <input
-            className="border rounded px-3 py-2 w-full"
+            className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400"
             placeholder="Firstname"
             value={firstname}
             onChange={(e) => setFirstname(e.target.value)}
             required
           />
           <input
-            className="border rounded px-3 py-2 w-full"
+            className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400"
             placeholder="Lastname"
             value={lastname}
             onChange={(e) => setLastname(e.target.value)}
@@ -193,7 +219,7 @@ export default function AdminUsers() {
 
         <input
           type="email"
-          className="border rounded px-3 py-2 w-full"
+          className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400"
           placeholder="Email (optional)"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -201,22 +227,26 @@ export default function AdminUsers() {
 
         <div className="relative">
           <input
-            className={`border rounded px-3 py-2 w-full ${
-              usernameStatus === "taken" ? "border-red-300" : ""
+            className={`border rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 ${
+              usernameStatus === "taken" ? "border-red-300" : "border-gray-300"
             } ${usernameStatus === "available" ? "border-green-300" : ""}`}
             placeholder="Username (auto-generated)"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setUsername(value);
+              setUsernameTouched(value.length > 0);
+            }}
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">
             {usernameStatus === "checking" && (
-              <span className="text-black/40">...</span>
+              <span className="text-gray-400">...</span>
             )}
             {usernameStatus === "available" && (
-              <span className="text-green-600">Available</span>
+              <span className="text-green-600 text-xs font-medium">Available</span>
             )}
             {usernameStatus === "taken" && (
-              <span className="text-red-600">Taken</span>
+              <span className="text-red-600 text-xs font-medium">Taken</span>
             )}
           </div>
         </div>
@@ -231,11 +261,24 @@ export default function AdminUsers() {
           </button>
         )}
 
+        <div>
+          <div className="text-sm font-medium text-gray-700 mb-1">Género</div>
+          <select
+            className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+          >
+            <option value="">Sin especificar</option>
+            <option value="male">Masculino</option>
+            <option value="female">Femenino</option>
+          </select>
+        </div>
+
         <div className="space-y-1">
-          <div className="text-sm text-black/60">Roles</div>
+          <div className="text-sm font-medium text-gray-700">Roles</div>
           <div className="flex flex-wrap gap-3">
             {["publisher", "cartplanner", "fieldserviceplanner", "admin"].map((r) => (
-              <label key={r} className="flex items-center gap-1.5 text-sm">
+              <label key={r} className="flex items-center gap-2 text-sm text-gray-700">
                 <input
                   type="checkbox"
                   checked={roles.includes(r)}
@@ -246,6 +289,7 @@ export default function AdminUsers() {
                       setRoles(roles.filter((x) => x !== r));
                     }
                   }}
+                  className="rounded border-gray-300 text-gray-900 focus:ring-gray-900/10"
                 />
                 {r}
               </label>
@@ -256,47 +300,87 @@ export default function AdminUsers() {
         <button
           type="submit"
           disabled={usernameStatus === "taken"}
-          className="bg-black text-white px-4 py-2 rounded disabled:opacity-50"
+          className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50"
         >
           Create User & Copy Invite Link
         </button>
       </form>
 
-      <div className="border rounded-xl bg-white">
-        <div className="border-b p-3 font-medium">Users</div>
+      <div className="border border-gray-200 rounded-2xl bg-white shadow-sm">
+        <div className="border-b border-gray-100 px-5 py-4 font-semibold text-gray-900">Users</div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-neutral-50">
-                <th className="text-left p-3 font-medium">Name</th>
-                <th className="text-left p-3 font-medium">Username</th>
-                <th className="text-left p-3 font-medium">Email</th>
-                <th className="text-left p-3 font-medium">Role</th>
-                <th className="text-left p-3 font-medium">Status</th>
-                <th className="text-left p-3 font-medium">Actions</th>
+              <tr className="border-b border-gray-100 bg-gray-50">
+                <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Username</th>
+                <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Género</th>
+                <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+                <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-gray-100">
               {users.map((user) => (
                 <tr key={user.id}>
-                  <td className="p-3">
+                  <td className="p-4 text-gray-900">
                     {user.firstname} {user.lastname}
                   </td>
-                  <td className="p-3 font-mono text-black/60">{user.username}</td>
-                  <td className="p-3 text-black/60">{user.email || "-"}</td>
-                  <td className="p-3">
+                  <td className="p-4 font-mono text-gray-500">{user.username}</td>
+                  <td className="p-4 text-gray-500">{user.email || "-"}</td>
+                  <td className="p-4">
+                    {user.username === "congregation-admin" ? (
+                      <span className="text-xs text-gray-400">{user.gender || "-"}</span>
+                    ) : editingGenderId === user.id ? (
+                      <div className="flex items-center gap-1">
+                        <select
+                          className="border border-gray-300 rounded-md px-2 py-1 text-xs"
+                          value={editingGender}
+                          onChange={(e) => setEditingGender(e.target.value)}
+                        >
+                          <option value="">-</option>
+                          <option value="male">M</option>
+                          <option value="female">F</option>
+                        </select>
+                        <button
+                          onClick={() => saveGender(user.id)}
+                          className="text-xs text-green-700 hover:underline"
+                        >
+                          OK
+                        </button>
+                        <button
+                          onClick={() => setEditingGenderId(null)}
+                          className="text-xs text-gray-400 hover:underline"
+                        >
+                          X
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setEditingGenderId(user.id);
+                          setEditingGender(user.gender || "");
+                        }}
+                        className="text-xs text-gray-600 hover:text-gray-900 hover:underline"
+                      >
+                        {user.gender === "male" ? "M" : user.gender === "female" ? "F" : "-"}
+                      </button>
+                    )}
+                  </td>
+                  <td className="p-4">
                     <div className="flex flex-wrap gap-1">
                       {(user.roles || []).map((r) => (
                         <span
                           key={r}
-                          className={`px-2 py-0.5 rounded text-xs ${
+                          className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                             r === "admin"
                               ? "bg-purple-100 text-purple-700"
                               : r === "cartplanner"
                               ? "bg-blue-100 text-blue-700"
                               : r === "fieldserviceplanner"
                               ? "bg-teal-100 text-teal-700"
-                              : "bg-neutral-100 text-neutral-600"
+                              : "bg-gray-100 text-gray-700"
                           }`}
                         >
                           {r}
@@ -304,38 +388,38 @@ export default function AdminUsers() {
                       ))}
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-4">
                     {!user.active ? (
-                      <span className="px-2 py-0.5 rounded text-xs bg-red-100 text-red-700">
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
                         Inactive
                       </span>
                     ) : user.has_password ? (
-                      <span className="px-2 py-0.5 rounded text-xs bg-green-100 text-green-700">
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
                         Registered
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded text-xs bg-yellow-100 text-yellow-700">
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
                         Pending
                       </span>
                     )}
                   </td>
-                  <td className="p-3">
+                  <td className="p-4">
                     {user.username === "congregation-admin" ? (
-                      <span className="text-xs text-black/40">Protected</span>
+                      <span className="text-xs text-gray-400">Protected</span>
                     ) : (
                       <div className="space-y-2">
                         <div className="flex gap-2 flex-wrap">
                           {!user.has_password ? (
                             <button
                               onClick={() => copyInviteLink(user.id)}
-                              className="text-blue-600 hover:underline text-sm"
+                              className="text-sm text-gray-700 hover:text-gray-900 hover:underline"
                             >
                               {copiedId === user.id ? "Copied!" : "Copy Link"}
                             </button>
                           ) : (
                             <button
                               onClick={() => resetPassword(user.id, user.firstname)}
-                              className="text-blue-600 hover:underline text-sm"
+                              className="text-sm text-gray-700 hover:text-gray-900 hover:underline"
                             >
                               Reset Password
                             </button>
@@ -345,28 +429,28 @@ export default function AdminUsers() {
                               setEditingRolesId(editingRolesId === user.id ? null : user.id);
                               setEditingRoles(user.roles || []);
                             }}
-                            className="text-purple-600 hover:underline text-sm"
+                            className="text-sm text-gray-700 hover:text-gray-900 hover:underline"
                           >
                             Roles
                           </button>
                           <button
                             onClick={() => toggleActive(user.id, user.active)}
-                            className="text-orange-600 hover:underline text-sm"
+                            className="text-sm text-gray-700 hover:text-gray-900 hover:underline"
                           >
                             {user.active ? "Deactivate" : "Activate"}
                           </button>
                           <button
                             onClick={() => deleteUser(user.id, user.username)}
-                            className="text-red-600 hover:underline text-sm"
+                            className="text-sm text-red-600 hover:text-red-700 hover:underline"
                           >
                             Delete
                           </button>
                         </div>
                         {editingRolesId === user.id && (
-                          <div className="border rounded p-2 bg-neutral-50 space-y-2">
+                          <div className="border border-gray-200 rounded-lg p-3 bg-gray-50 space-y-2">
                             <div className="flex flex-wrap gap-2">
                               {["publisher", "cartplanner", "fieldserviceplanner", "admin"].map((r) => (
-                                <label key={r} className="flex items-center gap-1 text-xs">
+                                <label key={r} className="flex items-center gap-2 text-xs text-gray-700">
                                   <input
                                     type="checkbox"
                                     checked={editingRoles.includes(r)}
@@ -377,6 +461,7 @@ export default function AdminUsers() {
                                         setEditingRoles(editingRoles.filter((x) => x !== r));
                                       }
                                     }}
+                                    className="rounded border-gray-300 text-gray-900 focus:ring-gray-900/10"
                                   />
                                   {r}
                                 </label>
@@ -386,13 +471,13 @@ export default function AdminUsers() {
                               <button
                                 onClick={() => saveRoles(user.id)}
                                 disabled={editingRoles.length === 0}
-                                className="bg-black text-white px-2 py-1 rounded text-xs disabled:opacity-50"
+                                className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-black disabled:opacity-50"
                               >
                                 Save
                               </button>
                               <button
                                 onClick={() => setEditingRolesId(null)}
-                                className="text-xs text-black/60 hover:underline"
+                                className="text-xs text-gray-600 hover:underline"
                               >
                                 Cancel
                               </button>
@@ -408,7 +493,7 @@ export default function AdminUsers() {
           </table>
         </div>
         {users.length === 0 && (
-          <div className="p-3 text-sm text-black/60">No users yet</div>
+          <div className="p-4 text-sm text-gray-500">No users yet</div>
         )}
       </div>
     </div>
