@@ -60,7 +60,22 @@ def generate_cart_schedule_pdf(sessions, month: str) -> io.BytesIO:
 
     styles = getSampleStyleSheet()
     title_style = ParagraphStyle("title", parent=styles["Title"], fontSize=14, leading=16)
-    header_style = ParagraphStyle("header", parent=styles["Normal"], fontSize=8, leading=9, alignment=1)
+    header_style = ParagraphStyle(
+        "header",
+        parent=styles["Normal"],
+        fontSize=8,
+        leading=9,
+        alignment=1,
+        textColor=colors.HexColor("#6B7280"),
+    )
+    time_style = ParagraphStyle(
+        "time",
+        parent=styles["Normal"],
+        fontSize=8,
+        leading=9,
+        alignment=1,
+        textColor=colors.HexColor("#DC2626"),
+    )
     cell_style = ParagraphStyle("cell", parent=styles["Normal"], fontSize=7, leading=8, alignment=1)
     captain_style = ParagraphStyle("captain", parent=styles["Normal"], fontSize=7, leading=8, textColor=colors.red, alignment=1)
 
@@ -108,7 +123,12 @@ def generate_cart_schedule_pdf(sessions, month: str) -> io.BytesIO:
     for slot in slot_list:
         time_str = f"{slot['start_time'].strftime('%H:%M')}-{slot['end_time'].strftime('%H:%M')}"
         day_name = DAY_NAMES_ES.get(slot["weekday"], "")
-        header_time.append(Paragraph(f"<b>{time_str}</b><br/>{day_name.upper()}", header_style))
+        header_time.append(
+            Paragraph(
+                f'<font color="#DC2626"><b>{time_str}</b></font><br/><font color="#6B7280">{day_name.upper()}</font>',
+                header_style,
+            )
+        )
 
         cart_label = slot["cart_name"]
         if slot["cart_location"]:
@@ -187,6 +207,7 @@ def generate_cart_schedule_pdf(sessions, month: str) -> io.BytesIO:
 
     # Header styles
     style_cmds.append(("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#E5E7EB")))
+    style_cmds.append(("TEXTCOLOR", (0, 0), (-1, 0), colors.HexColor("#6B7280")))
     style_cmds.append(("FONTSIZE", (0, 0), (-1, 0), 8))
     style_cmds.append(("FONTSIZE", (0, 1), (-1, 1), 8))
 
