@@ -23,8 +23,8 @@ const TILES = [
   },
   {
     id: "meeting-points",
-    title: "Planificador de puntos",
-    description: "Crear y editar puntos de reunión",
+    title: "Planificación de Consideraciones",
+    description: "Crear y editar consideraciones",
     to: "/user/meeting-points",
     roles: ["fieldserviceplanner", "admin"],
   },
