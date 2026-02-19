@@ -82,7 +82,6 @@ export default function TopNav() {
                   )}
                 </span>
               </NavLink>
-              <NavLink to="/user/events" className={navLinkClass}>Events</NavLink>
               <NavLink to="/user/meeting-points" className={navLinkClass}>Puntos de Encuentro</NavLink>
               <NavLink to="/user/stats" className={navLinkClass}>Stats</NavLink>
               <NavLink to="/user/absences" className={navLinkClass}>Ausencias</NavLink>
@@ -181,9 +180,6 @@ export default function TopNav() {
                   {pendingCount}
                 </span>
               )}
-            </NavLink>
-            <NavLink to="/user/events" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50"}`}>
-              Events
             </NavLink>
             <NavLink to="/user/meeting-points" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50"}`}>
               Puntos de Encuentro

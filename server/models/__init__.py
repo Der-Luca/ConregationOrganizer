@@ -1,6 +1,5 @@
 from models.user import User
 from models.cart import Cart
-from models.event import Event
 from models.cart_session import CartSession
 from models.cart_assignment import CartAssignment
 from models.refresh_token import RefreshToken

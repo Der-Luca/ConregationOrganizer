@@ -16,14 +16,6 @@ export default function AdminLayout() {
             Admin Carts
           </NavLink>
           <NavLink
-            to="/admin/events"
-            className={({ isActive }) =>
-              `font-medium ${isActive ? "text-gray-900" : "text-gray-500 hover:text-gray-900"}`
-            }
-          >
-            Admin Events
-          </NavLink>
-          <NavLink
             to="/admin/users"
             className={({ isActive }) =>
               `font-medium ${isActive ? "text-gray-900" : "text-gray-500 hover:text-gray-900"}`

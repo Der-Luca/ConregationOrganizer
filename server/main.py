@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from sqlalchemy import text
-from routers import carts, events
+from routers import carts
 from db.database import engine
 from db.base import Base
 import models  # triggers model imports
@@ -36,7 +36,6 @@ def db_health():
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(carts.router)
-app.include_router(events.router)
 app.include_router(cart_sessions.router)
 app.include_router(register.router)
 app.include_router(meeting_points.router)

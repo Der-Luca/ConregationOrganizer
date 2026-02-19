@@ -8,9 +8,7 @@ import AdminLayout from "./layout/AdminLayout";
 import UserLayout from "./layout/UserLayout";
 
 import AdminCarts from "./pages/admin/AdminCarts";
-import AdminEvents from "./pages/admin/AdminEvents";
 import AdminUsers from "./pages/admin/AdminUsers";
-import UserEvents from "./pages/user/UserEvents";
 import CartSchedule from "./pages/user/CartSchedule";
 import MyAssignments from "./pages/user/MyAssignments";
 import MeetingPoints from "./pages/user/MeetingPoints";
@@ -36,7 +34,6 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
-        <Route path="events" element={<UserEvents />} />
         <Route path="cart-schedule" element={<CartSchedule />} />
         <Route path="my-assignments" element={<MyAssignments />} />
         <Route path="meeting-points" element={<MeetingPoints />} />
@@ -55,7 +52,6 @@ export default function App() {
         }
       >
         <Route path="carts" element={<AdminCarts />} />
-        <Route path="events" element={<AdminEvents />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="stats" element={<Stats />} />
       </Route>

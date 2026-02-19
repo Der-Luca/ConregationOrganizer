@@ -13,7 +13,6 @@ from models.user import User
 from models.cart import Cart
 from models.cart_session import CartSession
 from models.cart_assignment import CartAssignment
-from models.event import Event
 from models.refresh_token import RefreshToken
 from models.meeting_point import MeetingPoint
 from models.absence import Absence
