@@ -17,6 +17,7 @@ import Dashboard from "./pages/user/Dashboard";
 import Home from "./pages/user/Home";
 import Stats from "./pages/shared/Stats";
 import Absences from "./pages/user/Absences";
+import TalkMedia from "./pages/user/TalkMedia";
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
       >
         <Route index element={<Home />} />
         <Route path="agenda" element={<Dashboard />} />
+        <Route path="talk-media" element={<TalkMedia />} />
         <Route path="cart-schedule" element={<CartSchedule />} />
         <Route path="my-assignments" element={<MyAssignments />} />
         <Route path="meeting-points" element={<MeetingPoints />} />

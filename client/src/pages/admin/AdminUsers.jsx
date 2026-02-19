@@ -19,6 +19,18 @@ export default function AdminUsers() {
   const [editingGenderId, setEditingGenderId] = useState(null);
   const [editingGender, setEditingGender] = useState("");
 
+  const ROLE_LABELS = {
+    admin: "Administrador",
+    cartplanner: "Planificador de carritos",
+    fieldserviceplanner: "Planificador de servicio",
+    talk_assistant: "Asistente de discurso",
+    publisher: "Publicador",
+  };
+
+  function roleLabel(role) {
+    return ROLE_LABELS[role] || role;
+  }
+
   async function loadUsers() {
     const res = await api.get("/users");
     setUsers(res.data);
@@ -277,7 +289,7 @@ export default function AdminUsers() {
         <div className="space-y-1">
           <div className="text-sm font-medium text-gray-700">Roles</div>
           <div className="flex flex-wrap gap-3">
-            {["publisher", "cartplanner", "fieldserviceplanner", "admin"].map((r) => (
+            {["publisher", "cartplanner", "fieldserviceplanner", "talk_assistant", "admin"].map((r) => (
               <label key={r} className="flex items-center gap-2 text-sm text-gray-700">
                 <input
                   type="checkbox"
@@ -291,7 +303,7 @@ export default function AdminUsers() {
                   }}
                   className="rounded border-gray-300 text-gray-900 focus:ring-gray-900/10"
                 />
-                {r}
+                {roleLabel(r)}
               </label>
             ))}
           </div>
@@ -380,10 +392,12 @@ export default function AdminUsers() {
                               ? "bg-blue-100 text-blue-700"
                               : r === "fieldserviceplanner"
                               ? "bg-teal-100 text-teal-700"
+                              : r === "talk_assistant"
+                              ? "bg-amber-100 text-amber-700"
                               : "bg-gray-100 text-gray-700"
                           }`}
                         >
-                          {r}
+                          {roleLabel(r)}
                         </span>
                       ))}
                     </div>
@@ -449,7 +463,7 @@ export default function AdminUsers() {
                         {editingRolesId === user.id && (
                           <div className="border border-gray-200 rounded-lg p-3 bg-gray-50 space-y-2">
                             <div className="flex flex-wrap gap-2">
-                              {["publisher", "cartplanner", "fieldserviceplanner", "admin"].map((r) => (
+                              {["publisher", "cartplanner", "fieldserviceplanner", "talk_assistant", "admin"].map((r) => (
                                 <label key={r} className="flex items-center gap-2 text-xs text-gray-700">
                                   <input
                                     type="checkbox"
@@ -463,7 +477,7 @@ export default function AdminUsers() {
                                     }}
                                     className="rounded border-gray-300 text-gray-900 focus:ring-gray-900/10"
                                   />
-                                  {r}
+                                  {roleLabel(r)}
                                 </label>
                               ))}
                             </div>

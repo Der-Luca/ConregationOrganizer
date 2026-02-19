@@ -6,7 +6,7 @@ from sqlalchemy.sql import func
 from db.base import Base
 
 
-VALID_ROLES = {"publisher", "cartplanner", "fieldserviceplanner", "admin"}
+VALID_ROLES = {"publisher", "cartplanner", "fieldserviceplanner", "talk_assistant", "admin"}
 
 
 class User(Base):

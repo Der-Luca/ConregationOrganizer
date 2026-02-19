@@ -29,6 +29,7 @@ export default function TopNav() {
     admin: "Administrador",
     cartplanner: "Planificador de carritos",
     fieldserviceplanner: "Planificador de servicio",
+    talk_assistant: "Asistente de discurso",
     publisher: "Publicador",
   };
 

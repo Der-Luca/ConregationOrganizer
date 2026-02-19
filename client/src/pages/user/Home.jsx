@@ -4,7 +4,7 @@ import { useAuth } from "../../auth/AuthContext";
 const TILES = [
   {
     id: "agenda",
-    title: "Consideraciones",
+    title: "Agenda",
     description: "Calendario con puntos y asignaciones",
     to: "/user/agenda",
   },
@@ -13,6 +13,13 @@ const TILES = [
     title: "Mis asignaciones",
     description: "Aceptar o rechazar turnos",
     to: "/user/my-assignments",
+  },
+  {
+    id: "talk-media",
+    title: "Medios del discurso",
+    description: "Archivos para el discurso",
+    to: "/user/talk-media",
+    roles: ["talk_assistant", "admin"],
   },
   {
     id: "meeting-points",
