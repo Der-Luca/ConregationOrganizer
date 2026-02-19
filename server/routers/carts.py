@@ -75,6 +75,7 @@ def update_cart(
 
     cart.name = data.name
     cart.location = data.location
+    cart.color = data.color
     db.commit()
     db.refresh(cart)
     return cart

@@ -8,10 +8,12 @@ export default function AdminCarts() {
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [color, setColor] = useState("#cbd5f5");
 
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState("");
   const [editLocation, setEditLocation] = useState("");
+  const [editColor, setEditColor] = useState("#cbd5f5");
 
   async function load() {
     setIsLoading(true);
@@ -32,9 +34,11 @@ export default function AdminCarts() {
     await api.post("/carts", {
       name,
       location: location || null,
+      color: color || null,
     });
     setName("");
     setLocation("");
+    setColor("#cbd5f5");
     load();
   }
 
@@ -42,12 +46,14 @@ export default function AdminCarts() {
     setEditingId(cart.id);
     setEditName(cart.name);
     setEditLocation(cart.location || "");
+    setEditColor(cart.color || "#cbd5f5");
   }
 
   async function saveEdit(id) {
     await api.put(`/carts/${id}`, {
       name: editName,
       location: editLocation || null,
+      color: editColor || null,
     });
     setEditingId(null);
     load();
@@ -57,6 +63,7 @@ export default function AdminCarts() {
     setEditingId(null);
     setEditName("");
     setEditLocation("");
+    setEditColor("#cbd5f5");
   }
 
   async function toggle(id) {
@@ -69,7 +76,7 @@ export default function AdminCarts() {
   }
 
   async function remove(id) {
-    if (!confirm("¿Seguro que quieres eliminar este carrito?")) return;
+    if (!confirm("¿Seguro que quieres eliminar este P-Poc?")) return;
     await api.delete(`/carts/${id}`);
     load();
   }
@@ -80,19 +87,19 @@ export default function AdminCarts() {
 
   return (
     <AppLayout
-      title="Administrar carritos"
-      subtitle="Gestión de flotas y ubicaciones"
+      title="Administrar P-Poc"
+      subtitle="Gestión de P-Poc y ubicaciones"
     >
       <div className="space-y-6">
         
         {/* CREATE SECTION */}
-        <Card title="Nuevo Carrito">
+        <Card title="Nuevo P-Poc">
           <form onSubmit={create} className="flex flex-col sm:flex-row gap-4 items-end">
             <div className="w-full sm:flex-1">
-              <label className="block text-xs font-medium text-gray-700 mb-1 ml-1">Nombre del Carrito</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1 ml-1">Nombre del P-Poc</label>
               <input
                 className="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition shadow-sm"
-                placeholder="Ej. Carrito Norte 01"
+                placeholder="Ej. P-Poc Norte 01"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -105,6 +112,15 @@ export default function AdminCarts() {
                 placeholder="Ej. Entrada Principal"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
+              />
+            </div>
+            <div className="w-full sm:w-32">
+              <label className="block text-xs font-medium text-gray-700 mb-1 ml-1">Color</label>
+              <input
+                type="color"
+                className="w-full h-10 rounded-lg border-gray-300 border"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
               />
             </div>
             <button 
@@ -121,7 +137,7 @@ export default function AdminCarts() {
         {/* LIST SECTION */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-            <h3 className="text-base font-semibold text-gray-900">Listado de Carritos</h3>
+            <h3 className="text-base font-semibold text-gray-900">Listado de P-Poc</h3>
             <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium">
               Total: {items.length}
             </span>
@@ -132,6 +148,7 @@ export default function AdminCarts() {
               <thead className="bg-gray-50 text-xs uppercase font-semibold text-gray-500">
                 <tr>
                   <th className="px-6 py-3">Nombre</th>
+                  <th className="px-6 py-3">Color</th>
                   <th className="px-6 py-3">Ubicación</th>
                   <th className="px-6 py-3 text-center">Estado</th>
                   <th className="px-6 py-3 text-right">Acciones</th>
@@ -140,8 +157,8 @@ export default function AdminCarts() {
               <tbody className="divide-y divide-gray-100">
                 {items.length === 0 && !isLoading ? (
                   <tr>
-                    <td colSpan="4" className="px-6 py-8 text-center text-gray-400">
-                      No hay carritos creados todavía.
+                    <td colSpan="5" className="px-6 py-8 text-center text-gray-400">
+                      No hay P-Poc creados todavía.
                     </td>
                   </tr>
                 ) : (
@@ -157,6 +174,14 @@ export default function AdminCarts() {
                               className="w-full rounded border-gray-300 border px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                               value={editName}
                               onChange={(e) => setEditName(e.target.value)}
+                            />
+                          </td>
+                          <td className="px-6 py-3">
+                            <input
+                              type="color"
+                              className="w-10 h-8 rounded border-gray-300 border"
+                              value={editColor}
+                              onChange={(e) => setEditColor(e.target.value)}
                             />
                           </td>
                           <td className="px-6 py-3">
@@ -186,6 +211,15 @@ export default function AdminCarts() {
                         <>
                           <td className="px-6 py-4 font-medium text-gray-900">
                             {c.name}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="w-4 h-4 rounded border border-gray-200"
+                                style={{ backgroundColor: c.color || "#e5e7eb" }}
+                              />
+                              <span className="text-xs text-gray-500">{c.color || "-"}</span>
+                            </div>
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-1.5 text-gray-500">

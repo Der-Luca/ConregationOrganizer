@@ -30,7 +30,7 @@ const TILES = [
   },
   {
     id: "cart-schedule",
-    title: "Planificación de carritos",
+    title: "Planificación de P-Poc",
     description: "Gestionar sesiones y asignaciones",
     to: "/user/cart-schedule",
     roles: ["cartplanner", "admin"],
@@ -38,7 +38,7 @@ const TILES = [
   {
     id: "admin",
     title: "Administración",
-    description: "Usuarios, carritos y estadísticas",
+    description: "Usuarios, P-Poc y estadísticas",
     to: "/admin",
     roles: ["admin"],
   },

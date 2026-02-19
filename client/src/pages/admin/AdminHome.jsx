@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 const TILES = [
   {
     id: "carts",
-    title: "Carritos",
-    description: "Administrar carritos y ubicaciones",
+    title: "P-Poc",
+    description: "Administrar P-Poc y ubicaciones",
     to: "/admin/carts",
   },
   {

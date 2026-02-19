@@ -150,15 +150,35 @@ export default function CartSchedule() {
     <div className="max-w-6xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Planificación Carros</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Planificación P-Poc</h1>
         <div className="flex items-center gap-2">
           {canPlan && (
-            <button
-              onClick={handleCreate}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              + Nuevo
-            </button>
+            <>
+              <button
+                onClick={handleCreate}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                + Nuevo
+              </button>
+              <button
+                onClick={() => {
+                  api
+                    .get(`/cart-sessions/export?month=${month}`, { responseType: "blob" })
+                    .then((res) => {
+                      const url = window.URL.createObjectURL(new Blob([res.data]));
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `ppoc_${month}.pdf`;
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                    })
+                    .catch(() => alert("Error al exportar PDF"));
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Exportar PDF
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -231,7 +251,7 @@ export default function CartSchedule() {
                 <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Fecha</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Horario</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Carro</th>
+                  <th className="text-left px-4 py-3 font-semibold text-gray-600">P-Poc</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Asignados</th>
                   {canPlan && (
                     <th className="text-right px-4 py-3 font-semibold text-gray-600">Acciones</th>

@@ -13,6 +13,7 @@ class Cart(Base):
 
     name = Column(String, nullable=False)
     location = Column(String)
+    color = Column(String, nullable=True)
     active = Column(Boolean, default=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -92,7 +92,7 @@ export default function Dashboard() {
       end.setHours(eh, em);
       return {
         id: `cart-${session.id}`,
-        title: `${session.start_time?.slice(0, 5)} Carrito: ${session.cart_name}`,
+        title: `${session.start_time?.slice(0, 5)} P-Poc: ${session.cart_name}`,
         start,
         end,
         resource: { ...session, type: "cart" },
@@ -160,7 +160,7 @@ export default function Dashboard() {
               <span className="w-3 h-3 rounded bg-green-600 inline-block" /> Mi punto asignado
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded bg-amber-500 inline-block" /> Carrito asignado
+              <span className="w-3 h-3 rounded bg-amber-500 inline-block" /> P-Poc asignado
             </span>
           </div>
           <button
@@ -236,7 +236,7 @@ export default function Dashboard() {
                   </dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-500">Carrito</dt>
+                  <dt className="text-gray-500">P-Poc</dt>
                   <dd className="text-gray-900">{selectedEvent.cart_name}</dd>
                 </div>
                 <div className="flex justify-between">

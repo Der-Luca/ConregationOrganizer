@@ -21,7 +21,7 @@ export default function AdminUsers() {
 
   const ROLE_LABELS = {
     admin: "Administrador",
-    cartplanner: "Planificador de carritos",
+    cartplanner: "Planificador de P-Poc",
     fieldserviceplanner: "Planificador de servicio",
     talk_assistant: "Asistente de discurso",
     publisher: "Publicador",

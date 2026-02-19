@@ -6,15 +6,18 @@ from datetime import datetime
 class CartCreate(BaseModel):
     name: str
     location: str | None = None
+    color: str | None = None
 
 class CartUpdate(BaseModel):
     name: str
     location: str | None = None
+    color: str | None = None
 
 class CartOut(BaseModel):
     id: UUID
     name: str
     location: str | None
+    color: str | None
     active: bool
 
     class Config:

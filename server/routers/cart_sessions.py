@@ -2,8 +2,10 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
+from sqlalchemy.orm import joinedload
 
 from db.database import get_db
 from models.cart import Cart
@@ -117,6 +119,31 @@ def _validate_assignments(assignments: list[AssignmentInput], session_date, star
 
 
 # ── CartPlanner endpoints ──────────────────────────────────────────────
+
+@router.get("/export")
+def export_cart_sessions_pdf(
+    month: str = Query(..., description="Month in YYYY-MM format"),
+    db: Session = Depends(get_db),
+    _current_user=Depends(require_cartplanner),
+):
+    from utils.cart_schedule_pdf import generate_cart_schedule_pdf
+
+    sessions = (
+        db.query(CartSession)
+        .options(
+            joinedload(CartSession.cart),
+            joinedload(CartSession.assignments).joinedload(CartAssignment.user),
+        )
+        .filter(CartSession.month == month)
+        .order_by(CartSession.date, CartSession.start_time)
+        .all()
+    )
+    pdf_buffer = generate_cart_schedule_pdf(sessions, month)
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=ppoc_{month}.pdf"},
+    )
 
 @router.get("", response_model=list[CartSessionOut])
 def list_sessions(

@@ -186,7 +186,7 @@ export default function CartSessionModal({ isOpen, onClose, onSaved, editSession
 
           {/* Cart selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Carro</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">P-Poc</label>
             <select
               className="border rounded-lg px-3 py-2 w-full"
               value={cartId}
@@ -194,7 +194,7 @@ export default function CartSessionModal({ isOpen, onClose, onSaved, editSession
               required
               disabled={!!editSession}
             >
-              <option value="">Seleccionar carro...</option>
+              <option value="">Seleccionar P-Poc...</option>
               {carts.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name} {c.location ? `(${c.location})` : ""}

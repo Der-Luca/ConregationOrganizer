@@ -66,7 +66,7 @@ export default function Stats() {
           <div className="text-2xl font-semibold text-gray-900">{totalMeetingPoints}</div>
         </div>
         <div className="border border-gray-200 rounded-2xl bg-white p-4 shadow-sm">
-          <div className="text-xs uppercase tracking-wider text-gray-500">Carros</div>
+          <div className="text-xs uppercase tracking-wider text-gray-500">P-Poc</div>
           <div className="text-2xl font-semibold text-gray-900">{totalCartSessions}</div>
         </div>
       </div>
@@ -80,8 +80,8 @@ export default function Stats() {
                 <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Meeting Points</th>
                 <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Last MP</th>
-                <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Carros</th>
-                <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Last Carro</th>
+                <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">P-Poc</th>
+                <th className="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Último P-Poc</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
