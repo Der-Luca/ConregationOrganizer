@@ -145,7 +145,7 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Próximos turnos</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Consideraciones</h1>
           <p className="text-sm text-gray-500 mt-1">
             Calendario de asignaciones y puntos de reunión
           </p>
@@ -154,7 +154,7 @@ export default function Dashboard() {
           {/* Legend */}
           <div className="hidden sm:flex items-center gap-3 text-xs text-gray-500">
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded bg-gray-400 inline-block" /> Puntos de reunión
+              <span className="w-3 h-3 rounded bg-gray-400 inline-block" /> Consideraciones
             </span>
             <span className="flex items-center gap-1">
               <span className="w-3 h-3 rounded bg-green-600 inline-block" /> Mi punto asignado

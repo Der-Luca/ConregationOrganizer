@@ -157,7 +157,7 @@ export default function MeetingPoints() {
     <div className="max-w-6xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Puntos de Encuentro</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Consideraciones</h1>
         <div className="flex items-center gap-2">
           {canEdit && (
             <button

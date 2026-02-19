@@ -14,6 +14,7 @@ import MyAssignments from "./pages/user/MyAssignments";
 import MeetingPoints from "./pages/user/MeetingPoints";
 import MeetingPointStats from "./pages/user/MeetingPointStats";
 import Dashboard from "./pages/user/Dashboard";
+import Home from "./pages/user/Home";
 import Stats from "./pages/shared/Stats";
 import Absences from "./pages/user/Absences";
 
@@ -33,7 +34,8 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Dashboard />} />
+        <Route index element={<Home />} />
+        <Route path="agenda" element={<Dashboard />} />
         <Route path="cart-schedule" element={<CartSchedule />} />
         <Route path="my-assignments" element={<MyAssignments />} />
         <Route path="meeting-points" element={<MeetingPoints />} />
