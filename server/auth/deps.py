@@ -45,3 +45,11 @@ def require_fieldserviceplanner(current_user=Depends(get_current_user)):
     if "fieldserviceplanner" not in (roles or []) and "admin" not in (roles or []):
         raise HTTPException(status_code=403, detail="Field service planner or admin only")
     return current_user
+
+
+def require_talk_assistant(current_user=Depends(get_current_user)):
+    roles = current_user.get("roles") if isinstance(current_user, dict) else getattr(current_user, "roles", [])
+
+    if "talk_assistant" not in (roles or []) and "admin" not in (roles or []):
+        raise HTTPException(status_code=403, detail="Talk assistant or admin only")
+    return current_user

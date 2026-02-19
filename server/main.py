@@ -12,6 +12,7 @@ from routers import register
 from routers import meeting_points
 from routers import stats
 from routers import absences
+from routers import talk_uploads
 
 
 app = FastAPI()
@@ -41,6 +42,7 @@ app.include_router(register.router)
 app.include_router(meeting_points.router)
 app.include_router(stats.router)
 app.include_router(absences.router)
+app.include_router(talk_uploads.router)
 
 app.add_middleware(
     CORSMiddleware,

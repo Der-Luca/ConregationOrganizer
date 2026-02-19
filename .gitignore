@@ -40,6 +40,7 @@ venv/
 postgres-data/
 pgdata/
 *.sqlite3
+server/uploads/
 
 # --- Misc ---
 coverage/

@@ -16,6 +16,7 @@ from models.cart_assignment import CartAssignment
 from models.refresh_token import RefreshToken
 from models.meeting_point import MeetingPoint
 from models.absence import Absence
+from models.talk_upload import TalkUploadLink, TalkUploadFile
 
 # this is the Alembic Config object
 config = context.config

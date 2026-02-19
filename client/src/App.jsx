@@ -18,6 +18,7 @@ import Home from "./pages/user/Home";
 import Stats from "./pages/shared/Stats";
 import Absences from "./pages/user/Absences";
 import TalkMedia from "./pages/user/TalkMedia";
+import TalkUpload from "./pages/public/TalkUpload";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
       {/* PUBLIC ROUTES */}
       <Route path="/login" element={<Login />} />
       <Route path="/register/:token" element={<Register />} />
+      <Route path="/upload/:token" element={<TalkUpload />} />
 
       {/* USER (alle eingeloggten User, inkl. Admin) */}
       <Route
