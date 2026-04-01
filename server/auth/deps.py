@@ -15,8 +15,8 @@ def get_current_user(
             settings.jwt_secret,
             algorithms=[settings.jwt_algorithm],
         )
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=str(e))
+    except jwt.JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
     return payload
 

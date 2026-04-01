@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from pydantic import BaseModel
@@ -12,6 +12,8 @@ from models.user import User
 from models.refresh_token import RefreshToken
 from auth.security import verify_password
 from auth.jwt import create_access_token
+from auth.deps import get_current_user
+from limiter import limiter
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -28,6 +30,7 @@ class LoginRequest(BaseModel):
 
 class LoginResponse(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
     roles: list[str]
 
@@ -38,6 +41,7 @@ class RefreshRequest(BaseModel):
 
 class RefreshResponse(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
     roles: list[str]
 
@@ -47,7 +51,8 @@ class RefreshResponse(BaseModel):
 # ------------------------------------------------------------------
 
 @router.post("/login", response_model=LoginResponse)
-def login(data: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def login(request: Request, data: LoginRequest, db: Session = Depends(get_db)):
     identifier = data.identifier.strip().lower()
 
     user = (
@@ -90,12 +95,14 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
 
     return {
         "access_token": access_token,
+        "refresh_token": str(refresh_token),
         "roles": user.roles,
     }
 
 
 @router.post("/refresh", response_model=RefreshResponse)
-def refresh(data: RefreshRequest, db: Session = Depends(get_db)):
+@limiter.limit("30/minute")
+def refresh(request: Request, data: RefreshRequest, db: Session = Depends(get_db)):
     rt = (
         db.query(RefreshToken)
         .filter(
@@ -124,6 +131,18 @@ def refresh(data: RefreshRequest, db: Session = Depends(get_db)):
             detail="User not found or inactive",
         )
 
+    # Rotate: revoke old token, issue new one
+    rt.revoked = True
+    new_refresh_token = uuid.uuid4()
+    db.add(
+        RefreshToken(
+            user_id=user.id,
+            token=new_refresh_token,
+            expires_at=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_DAYS),
+            revoked=False,
+        )
+    )
+
     new_access_token = create_access_token(
         {
             "sub": str(user.id),
@@ -131,17 +150,27 @@ def refresh(data: RefreshRequest, db: Session = Depends(get_db)):
         }
     )
 
+    db.commit()
+
     return {
         "access_token": new_access_token,
+        "refresh_token": str(new_refresh_token),
         "roles": user.roles,
     }
 
 
 @router.post("/logout")
-def logout(data: RefreshRequest, db: Session = Depends(get_db)):
+def logout(
+    data: RefreshRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     rt = (
         db.query(RefreshToken)
-        .filter(RefreshToken.token == data.refresh_token)
+        .filter(
+            RefreshToken.token == data.refresh_token,
+            RefreshToken.user_id == current_user["sub"],
+        )
         .first()
     )
 

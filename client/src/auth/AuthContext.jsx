@@ -48,6 +48,15 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // Force logout triggered by api.js interceptor when refresh fails
+  useEffect(() => {
+    function handleForceLogout() {
+      clearAuth();
+    }
+    window.addEventListener("auth:logout", handleForceLogout);
+    return () => window.removeEventListener("auth:logout", handleForceLogout);
+  }, []);
+
   // Restore login on page reload
   useEffect(() => {
     const token = localStorage.getItem("access_token");
