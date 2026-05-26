@@ -7,7 +7,7 @@ export default function AdminUsers() {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
-  const [gender, setGender] = useState("");
+  const [gender, setGender] = useState("male");
   const [roles, setRoles] = useState(["publisher"]);
   const [usernameStatus, setUsernameStatus] = useState(null); // null | "checking" | "available" | "taken"
   const [usernameSuggestion, setUsernameSuggestion] = useState(null);
@@ -108,7 +108,7 @@ export default function AdminUsers() {
       setEmail("");
       setUsername("");
       setUsernameTouched(false);
-      setGender("");
+      setGender("male");
       setRoles(["publisher"]);
       setUsernameStatus(null);
       setUsernameSuggestion(null);
@@ -280,7 +280,6 @@ export default function AdminUsers() {
             value={gender}
             onChange={(e) => setGender(e.target.value)}
           >
-            <option value="">Sin especificar</option>
             <option value="male">Masculino</option>
             <option value="female">Femenino</option>
           </select>
@@ -351,7 +350,6 @@ export default function AdminUsers() {
                           value={editingGender}
                           onChange={(e) => setEditingGender(e.target.value)}
                         >
-                          <option value="">-</option>
                           <option value="male">M</option>
                           <option value="female">F</option>
                         </select>

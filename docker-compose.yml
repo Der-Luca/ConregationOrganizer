@@ -24,6 +24,8 @@ services:
       BOOTSTRAP_ADMIN_ENABLED: ${BOOTSTRAP_ADMIN_ENABLED}
       BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL}
       BOOTSTRAP_ADMIN_USERNAME: ${BOOTSTRAP_ADMIN_USERNAME}
+    volumes:
+      - co_uploads:/app/uploads
     depends_on:
       - co_db
 
@@ -41,3 +43,4 @@ services:
 
 volumes:
   co_db_data:
+  co_uploads:

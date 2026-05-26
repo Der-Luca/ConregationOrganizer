@@ -1,4 +1,8 @@
+import os
+os.environ["PYTHON multipart_MAX_SIZE"] = str(10 * 1024 * 1024 * 1024)  # 10GB
+
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from routers import carts
 from db.database import engine
@@ -13,10 +17,14 @@ from routers import meeting_points
 from routers import stats
 from routers import absences
 from routers import talk_uploads
+from routers import settings
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from limiter import limiter
 
+
+UPLOADS_DIR = "/app/uploads"
+os.makedirs(UPLOADS_DIR, exist_ok=True)
 
 app = FastAPI()
 app.state.limiter = limiter
@@ -48,6 +56,9 @@ app.include_router(meeting_points.router)
 app.include_router(stats.router)
 app.include_router(absences.router)
 app.include_router(talk_uploads.router)
+app.include_router(settings.router)
+
+app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,

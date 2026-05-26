@@ -14,6 +14,12 @@ const TILES = [
     to: "/admin/users",
   },
   {
+    id: "settings",
+    title: "Configuración",
+    description: "Personalizar apariencia y fondos",
+    to: "/admin/settings",
+  },
+  {
     id: "stats",
     title: "Estadísticas",
     description: "Ver reportes y métricas",

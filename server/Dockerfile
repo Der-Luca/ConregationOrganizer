@@ -13,8 +13,9 @@ RUN pip install --no-cache-dir \
     alembic \
     python-multipart \
     "pydantic[email]" \
-    slowapi
+    slowapi \
+    pillow
 
 COPY . .
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--timeout-keep-alive", "300", "--h11-max-incomplete-event-size", "0"]
