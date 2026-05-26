@@ -8,11 +8,14 @@ container contains live data.
 Configure these repository secrets before enabling the workflow:
 
 - `PROD_HOST`: production server IP or hostname
-- `PROD_USER`: SSH user, for example `luca`
-- `PROD_SSH_PRIVATE_KEY`: private key with SSH access to the server
-- `PROD_PATH`: optional, defaults to `/home/luca/services/conregation-organizer`
+- `PROD_USER`: restricted SSH user, for example `deploy-conregation`
+- `PROD_SSH_PRIVATE_KEY`: private key for the restricted deploy user
 
 ## Safety Rules
+
+The deploy user should be configured with an SSH forced command that can only
+run the server-side deployment command. Do not use a personal admin user for
+GitHub Actions.
 
 The deploy script refuses to run if the production checkout has uncommitted,
 staged, untracked, or non-fast-forward changes. This prevents CI from

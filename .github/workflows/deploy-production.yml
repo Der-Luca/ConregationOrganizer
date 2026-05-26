@@ -32,20 +32,10 @@ jobs:
           chmod 600 ~/.ssh/prod_key
           ssh-keyscan -H "$PROD_HOST" >> ~/.ssh/known_hosts
 
-      - name: Copy deploy script
-        env:
-          PROD_HOST: ${{ secrets.PROD_HOST }}
-          PROD_USER: ${{ secrets.PROD_USER }}
-        run: |
-          set -euo pipefail
-          scp -i ~/.ssh/prod_key scripts/deploy-production.sh "$PROD_USER@$PROD_HOST:/tmp/conregation-organizer-deploy.sh"
-
       - name: Run deploy
         env:
           PROD_HOST: ${{ secrets.PROD_HOST }}
           PROD_USER: ${{ secrets.PROD_USER }}
-          PROD_PATH: ${{ secrets.PROD_PATH }}
         run: |
           set -euo pipefail
-          ssh -i ~/.ssh/prod_key "$PROD_USER@$PROD_HOST" \
-            "DEPLOY_PATH='${PROD_PATH:-/home/luca/services/conregation-organizer}' BRANCH='main' bash /tmp/conregation-organizer-deploy.sh"
+          ssh -i ~/.ssh/prod_key -o IdentitiesOnly=yes "$PROD_USER@$PROD_HOST"
